@@ -3,13 +3,13 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import Script from "next/script";
-import { attributes, react as HomeContent } from "../content/index.md";
+import { attributes, react as HomeContent } from "../content/home.md";
 
 const Home: NextPage = () => {
   let { title, cats } = attributes;
   return (
     <>
-      <Script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></Script>
+      {/* <Script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></Script> */}
       <article>
         <h1>{title}</h1>
         <HomeContent />
