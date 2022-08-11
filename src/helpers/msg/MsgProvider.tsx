@@ -10,9 +10,12 @@ function MsgProvider() {
   const queryMsg = router.query[QSP.msg];
   const sev = router.query[QSP.sev];
   useEffect(() => {
+    let timer: any;
     if (queryMsg) {
       setmsg(decodeURIComponent(queryMsg as string));
+      timer = setTimeout(() => closeMsg(), 3000);
     }
+    return () => timer && clearTimeout(timer);
   }, [queryMsg]);
   return (
     <>
@@ -20,7 +23,7 @@ function MsgProvider() {
         <Alert
           severity={sev as AlertColor}
           onClose={closeMsg}
-          style={{ position: "fixed", bottom: 5, left: 5 }}
+          style={{ position: "fixed", bottom: 5, left: 5, zIndex: 9999 }}
           variant="filled"
         >
           {msg}

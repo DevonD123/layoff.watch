@@ -14,6 +14,7 @@ import FileUpload, { FileTypes } from "@c/Editor/FileUpload";
 import SearchSelect, { EntityType } from "@c/Editor/SearchSelect";
 import UrlInput from "@c/Editor/UrlInput";
 import { Button } from "@mui/material";
+import CompanySelect from "@c/Company/CompanySelect";
 
 const WSIWIGDynamic = dynamic(() => import("@c/Editor/WSIWG"), {
   ssr: false,
@@ -102,8 +103,9 @@ const Home: NextPage = () => {
               label="Title"
               placeholder="Article Title*"
             />
+            <CompanySelect canCreate />
 
-            <SearchSelect
+            {/* <SearchSelect
               name="companies"
               search={EntityType.Company}
               searchText=""
@@ -141,7 +143,7 @@ const Home: NextPage = () => {
               label="Positions Affected"
               values={[]}
               onSelect={(vals: string[]) => {}}
-            />
+            /> */}
 
             <TextInput
               id="est"

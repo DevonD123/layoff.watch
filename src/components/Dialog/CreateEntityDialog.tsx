@@ -1,72 +1,92 @@
-import React, { useState } from "react";
+import React from "react";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
+import Alert from "@mui/material/Alert";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { EntityType } from "@c/Editor/SearchSelect";
 
 interface ICreateEntityDialogProps {
   open: boolean;
   onClose: () => void;
   onAccept: () => void;
-  type: EntityType;
+  isLoading?: boolean;
+  acceptDisabled?: boolean;
+  title: string | React.ReactNode;
+  body?: string | React.ReactNode;
+  errorList?: { msg: string; sev?: "error" | "warning" }[];
 }
-
-const dialogTextMap = {
-  CSuit: {
-    title: "Add a new c-suit exec to our database",
-    body: "",
-  },
-  Company: {
-    title: "Add a new company to our database",
-    body: "",
-  },
-  Org: {
-    title: "Add a new org to our database",
-    body: "",
-  },
-  Position: {
-    title: "Add a new position type to our database",
-    body: "",
-  },
-};
 
 function CreateEntityDialog({
   open,
   onClose,
   onAccept,
-  type,
-}: ICreateEntityDialogProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [state, setState] = useState<any>({});
-  function validateAndSave() {
-    try {
-      setIsLoading(true);
-      /* type based validation & insert into db */
-      onAccept();
-    } catch {
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  title,
+  body,
+  children,
+  isLoading,
+  acceptDisabled,
+  errorList,
+}: React.PropsWithChildren<ICreateEntityDialogProps>) {
   function closeWithHoldForLoading() {
     if (isLoading) {
       return;
     }
     onClose();
   }
+  const errors = React.useMemo(() => {
+    if (!errorList || errorList.length <= 0) {
+      return <></>;
+    }
+    const errors = errorList.filter((li) => li.sev || "error" === "error");
+    if (errors.length <= 0) {
+      return <></>;
+    }
+    return (
+      <Alert severity="error" style={{ marginBottom: "2px" }}>
+        {errors.map(({ msg }) => (
+          <React.Fragment key={msg}>
+            {msg}
+            <br />
+          </React.Fragment>
+        ))}
+      </Alert>
+    );
+  }, [errorList]);
+
+  const warnings = React.useMemo(() => {
+    if (!errorList || errorList.length <= 0) {
+      return <></>;
+    }
+    const warnings = errorList.filter((li) => li.sev === "warning");
+    if (warnings.length <= 0) {
+      return <></>;
+    }
+    return (
+      <Alert severity="warning">
+        {warnings.map(({ msg }) => (
+          <React.Fragment key={msg}>
+            {msg}
+            <br />
+          </React.Fragment>
+        ))}
+      </Alert>
+    );
+  }, [errorList]);
+
   return (
     <Dialog
       open={open}
       onClose={closeWithHoldForLoading}
       disableEscapeKeyDown={isLoading}
     >
-      <DialogTitle>{dialogTextMap[type].title}</DialogTitle>
-      <DialogContent>
-        <DialogContentText>{dialogTextMap[type].body}</DialogContentText>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent style={{ paddingTop: ".5em" }}>
+        <DialogContentText>{body}</DialogContentText>
+        {errors}
+        {warnings}
+        {children}
       </DialogContent>
       <DialogActions>
         <Button
@@ -78,10 +98,10 @@ function CreateEntityDialog({
           Cancel
         </Button>
         <Button
-          onClick={validateAndSave}
+          onClick={onAccept}
           color="info"
           variant="contained"
-          disabled={isLoading}
+          disabled={acceptDisabled || isLoading}
         >
           Create
         </Button>

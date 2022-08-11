@@ -9,7 +9,10 @@ type Props = {
   label?: string | React.ReactElement;
   placeholder?: string;
   isTextField?: boolean;
-  helperText?: React.ReactElement;
+  helperText?: React.ReactElement | string;
+  onBlur?: () => void;
+  error?: boolean;
+  type?: "text" | "number";
 };
 
 function TextInput({
@@ -21,6 +24,9 @@ function TextInput({
   placeholder,
   isTextField,
   helperText,
+  onBlur,
+  error,
+  type,
 }: Props) {
   return (
     <TextField
@@ -31,11 +37,13 @@ function TextInput({
       label={label}
       id={id}
       name={name}
-      type={typeof value === "string" ? "text" : "number"}
+      type={type || typeof value === "string" ? "text" : "number"}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       helperText={helperText}
+      onBlur={onBlur}
+      error={error}
     />
   );
 }

@@ -25,3 +25,4 @@
 - [ ] job board
 - [ ] recruiter portal
 - [ ] comments
+- [ ] clearbit attribution in footer for logo api https://logo.clearbit.com/meta.com?size=100format=png <a style={{fontSize:12}} rel='nofollow href="https://clearbit.com">Logos provided by Clearbit</a>
