@@ -7,6 +7,7 @@ import {
   Button,
   AutocompleteRenderGetTagProps,
 } from "@mui/material";
+import { AddBox } from "@mui/icons-material";
 
 export enum EntityType {
   CSuit = "CSuit",
@@ -16,8 +17,8 @@ export enum EntityType {
 }
 
 type Props = {
-  values: any[];
-  onSelect: (allSelected: any[]) => void;
+  values: any[] | any;
+  onSelect: (allSelected: any[] | any) => void;
   label?: string;
   id: string;
   name: string;
@@ -32,6 +33,7 @@ type Props = {
     option: any,
     getTagProps: AutocompleteRenderGetTagProps
   ) => React.ReactNode;
+  disabled?: boolean;
 };
 
 function SearchSelect({
@@ -43,7 +45,10 @@ function SearchSelect({
   name,
   placeholder,
   createClicked,
+  disabled,
   loadingValues = false,
+  values,
+  onSelect,
   defaultValues = [],
   multiple = true,
 }: Props) {
@@ -51,12 +56,32 @@ function SearchSelect({
     <Grid container spacing={1} style={{ marginBottom: "1em" }}>
       <Grid item xs>
         <Autocomplete
+          value={values}
+          onChange={(_, newValue: any) => onSelect(newValue)}
+          disabled={disabled}
           loading={loadingValues}
           multiple={multiple}
           options={options}
           getOptionLabel={getOptionLabel}
           defaultValue={defaultValues}
           renderTags={renderTags}
+          isOptionEqualToValue={(opt: any, val: any) => {
+            if (typeof opt.id !== "undefined") {
+              return opt.id === val.id;
+            }
+            if (
+              typeof opt.company_id !== "undefined" &&
+              typeof opt.csuit !== "undefined"
+            ) {
+              return (
+                opt.company_id === val.company_id && opt.csuit === val.csuit
+              );
+            }
+            if (typeof opt === "string") {
+              return opt === val;
+            }
+            return false;
+          }}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -65,6 +90,7 @@ function SearchSelect({
               name={name}
               label={label}
               placeholder={placeholder}
+              disabled={disabled}
             />
           )}
         />
@@ -72,16 +98,29 @@ function SearchSelect({
       {typeof createClicked === "function" && (
         <Grid
           item
-          xs={4}
-          md={2}
+          // xs={4}
+          // md={2}
           style={{
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "flex-start",
             alignItems: "center",
+            paddingLeft: 0,
           }}
         >
-          <Button color="info" variant="contained" onClick={createClicked}>
-            Create
+          <Button
+            color="info"
+            variant="outlined"
+            onClick={createClicked}
+            disabled={disabled}
+            style={{
+              height: "100%",
+              borderLeft: "none",
+              borderBottomLeftRadius: 0,
+              borderTopLeftRadius: 0,
+            }}
+            startIcon={<AddBox />}
+          >
+            New
           </Button>
         </Grid>
       )}
@@ -90,24 +129,3 @@ function SearchSelect({
 }
 
 export default SearchSelect;
-/*
-{isCreateOpen && (
-             <CreateEntityDialog
-               open={isCreateOpen}
-               onAccept={() => setIsCreateOpen(false)}
-               onClose={() => setIsCreateOpen(false)}
-             />
-          )}
-*/
-
-/*
-(value: IResult[], getTagProps) =>
-            value.map((option: IResult, index: number) => (
-              // eslint-disable-next-line react/jsx-key
-              <Chip
-                variant="outlined"
-                label={option.title}
-                {...getTagProps({ index })}
-              />
-            ))
-*/

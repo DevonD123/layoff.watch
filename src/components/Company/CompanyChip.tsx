@@ -12,6 +12,7 @@ interface Props extends Pick<ChipProps, "onDelete" | "onClick"> {
    * if no logo url we use the placeholder avatar with text
    */
   logoUrl?: string;
+  title?: string;
 }
 const size = 25;
 function CompanyChip({ logoUrl, label, ...props }: Props) {

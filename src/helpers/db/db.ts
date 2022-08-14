@@ -8,62 +8,33 @@ import {
 import showMsg from "@h/msg";
 import { supabase } from "../supabaseClient";
 
-/* an example */
-export function useUser(uid: string) {
-  return useQuery(
-    ["user", { uid }],
-    () =>
-      supabase
-        .from("profiles")
-        .select()
-        .eq("id", uid)
-        .single()
-        .then(handleNonVisible),
-    { enabled: !!uid }
+export function usePositions() {
+  return useQuery(["position"], () =>
+    supabase
+      .from("position")
+      .select()
+      .eq("is_draft", false)
+      .then(handleVisibleGenericErr)
   );
 }
 
-export function useCompanies() {
-  return useQuery(
-    ["company"],
-    () =>
-      supabase
-        .from("company")
-        .select()
-        .eq("is_draft", false)
-        .then(handleNonVisible),
-    {}
-  );
-}
-
-interface ICompanyInput {
+interface IPositionInput {
   name: string;
-  logo_url?: string;
-  ticker?: string;
-  description?: string;
-  est_employee_count?: string;
+  abbreviation?: string;
 }
-export async function addCompanyAsDraft({
+export async function addPositionAsDraft({
   name,
-  logo_url,
-  ticker,
-  description,
-  est_employee_count,
-}: ICompanyInput) {
-  const { data, error } = await supabase.from("company").insert({
+  abbreviation,
+}: IPositionInput) {
+  const { data, error } = await supabase.from("position").insert({
     name,
-    logo_url: logo_url ? `https://logo.clearbit.com/${logo_url}` : undefined,
-    ticker,
-    description,
-    est_employee_count: est_employee_count
-      ? parseInt(est_employee_count.split(",").join(""))
-      : undefined,
+    abbreviation,
     is_draft: true,
   });
 
   if (error || !data || data.length <= 0) {
     console.error(error);
-    showMsg("Error adding company", "error");
+    showMsg("Error adding position", "error");
     return null;
   }
 

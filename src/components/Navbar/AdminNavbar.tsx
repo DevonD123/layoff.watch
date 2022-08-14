@@ -1,11 +1,14 @@
 import React from "react";
+import Link from "next/link";
+import { Paper } from "@mui/material";
 
 type Props = {};
 
 function AdminNavbar({}: Props) {
   return (
     <>
-      <div
+      <Paper
+        elevation={0}
         style={{
           width: "100%",
           position: "fixed",
@@ -19,13 +22,23 @@ function AdminNavbar({}: Props) {
           alignItems: "center",
         }}
       >
-        <a href="/admin">Admin Section</a>
+        <Link href="/admin" passHref>
+          <a>Admin Section</a>
+        </Link>
         <div>
-          <a href="/admin/users">Users</a> &nbsp;
-          <a href="/admin/submissions">Subs</a> &nbsp;
-          <a href="/admin">Create</a> &nbsp;
+          <Link href="/admin/users" passHref>
+            <a>Users</a>
+          </Link>
+          &nbsp;
+          <Link href="/admin/submission" passHref>
+            <a>Subs</a>
+          </Link>
+          &nbsp;
+          <Link href="/admin" passHref>
+            <a>Create</a>
+          </Link>
         </div>
-      </div>
+      </Paper>
       <div style={{ width: "100%", height: 55 }}></div>
     </>
   );

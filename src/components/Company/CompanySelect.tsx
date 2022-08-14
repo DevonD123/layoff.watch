@@ -1,26 +1,23 @@
 import React, { useState, useEffect } from "react";
 import SearchSelect from "@c/Editor/SearchSelect";
-import { useCompanies, addCompanyAsDraft } from "@h/db";
+import { useCompanies, addCompanyAsDraft } from "./db";
 import CompanyChip from "./CompanyChip";
 import CreateEntityDialog from "@c/Dialog/CreateEntityDialog";
 import { Grid, Typography } from "@mui/material";
 import TextInput from "@c/Editor/TextInput";
 import Image from "next/image";
 import showMsg from "@h/msg";
+import { ICompanyOption } from "./types";
+import { getCommaSeperatedText } from "./helper";
 
 type Props = {
   canCreate?: boolean;
   multiple?: boolean;
+  showAbbrvWhenSelected?: boolean;
+  onChange: (arr: any) => void;
+  values: any[];
 };
-interface ICompanyOption {
-  id: string;
-  name: string;
-  logo_url?: string;
-  ticker?: string;
-  description?: string;
-  est_employee_count?: number | string;
-  is_draft: boolean;
-}
+
 const defaultNewCompany = {
   id: "__",
   name: "",
@@ -31,10 +28,16 @@ const defaultNewCompany = {
   is_draft: true,
 };
 
-function CompanySelect({ canCreate, multiple = true }: Props) {
-  const { data, status, refetch } = useCompanies();
+function CompanySelect({
+  canCreate,
+  multiple = true,
+  onChange,
+  values,
+  showAbbrvWhenSelected = false,
+}: Props) {
+  const { data, status } = useCompanies();
   const isLoading = status === "loading";
-  const [selectedCompany, setSelectedCompany] = useState<ICompanyOption[]>([]);
+  // const [selectedCompany, setSelectedCompany] = useState<ICompanyOption[]>([]);
   const [localCompanies, setLocalCompanies] = useState<ICompanyOption[]>([]);
 
   const [createOpen, setCreateOpen] = useState(false);
@@ -67,7 +70,8 @@ function CompanySelect({ canCreate, multiple = true }: Props) {
       if (res) {
         const allLocalCompanies = [...localCompanies, res];
         setLocalCompanies(allLocalCompanies);
-        setSelectedCompany([...selectedCompany, res]);
+        // setSelectedCompany([...selectedCompany, res]);
+        onChange([...values, res]);
         setCreateOpen(false);
         localStorage.setItem(
           "local_draft_companies",
@@ -104,12 +108,14 @@ function CompanySelect({ canCreate, multiple = true }: Props) {
         loadingValues={isLoading}
         id="companySelect"
         name="companySelect"
-        values={selectedCompany}
+        // values={selectedCompany}
+        values={values}
         onSelect={(allSelected: ICompanyOption[]) =>
-          setSelectedCompany(allSelected || [])
+          // setSelectedCompany(allSelected || [])
+          onChange(allSelected || [])
         }
-        label="company select"
-        placeholder="Select a company"
+        label="Companies"
+        placeholder="Microsoft"
         multiple={multiple}
         createClicked={
           canCreate
@@ -124,12 +130,18 @@ function CompanySelect({ canCreate, multiple = true }: Props) {
             // eslint-disable-next-line react/jsx-key
             <CompanyChip
               logoUrl={option.logo_url}
-              label={option.name}
+              label={
+                showAbbrvWhenSelected && option.ticker
+                  ? option.ticker
+                  : option.name
+              }
               {...getTagProps({ index })}
             />
           ))
         }
-        getOptionLabel={(opt) => opt.name}
+        getOptionLabel={(opt) =>
+          opt.ticker ? `${opt.ticker} | ${opt.name}` : opt.name
+        }
       />
       {canCreate && createOpen && (
         <CreateEntityDialog
@@ -186,25 +198,11 @@ function CompanySelect({ canCreate, multiple = true }: Props) {
                 name="newEstEmployeeCount"
                 value={newCompany.est_employee_count || ""}
                 onChange={(est_employee_count) => {
-                  const emp = est_employee_count.split(",").join("");
-                  if (
-                    est_employee_count === "" ||
-                    emp === "" ||
-                    /^[0-9]*$/.test(emp)
-                  ) {
-                    let resWithCommas = emp;
-                    const charsLength = emp.length;
-                    if (charsLength >= 4) {
-                      let chunks = [];
-
-                      for (let i = charsLength - 3; i >= -2; i -= 3) {
-                        chunks.unshift(emp.substring(i, i + 3));
-                      }
-                      resWithCommas = chunks.join(",");
-                    }
+                  const result = getCommaSeperatedText(est_employee_count);
+                  if (result !== null) {
                     setNewCompany({
                       ...newCompany,
-                      est_employee_count: resWithCommas,
+                      est_employee_count: result,
                     });
                   }
                 }}

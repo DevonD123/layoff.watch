@@ -32,6 +32,7 @@ function WSIWG(props: IProps) {
         borderTopColor: "transparent",
         borderBottomLeftRadius: theme.shape.borderRadius,
         borderBottomRightRadius: theme.shape.borderRadius,
+        minHeight: 200,
       }}
       toolbar={{
         options: [

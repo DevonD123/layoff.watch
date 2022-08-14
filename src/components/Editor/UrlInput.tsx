@@ -8,7 +8,7 @@ type Props = {
   onChange: (val: any) => void;
   label?: string | React.ReactElement;
   placeholder?: string;
-  helperText?: React.ReactElement;
+  helperText?: React.ReactElement | string;
 };
 
 function UrlInput({
