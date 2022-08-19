@@ -1,11 +1,5 @@
 import React from "react";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import Alert from "@mui/material/Alert";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
+import { Modal, Button, Group, Alert } from "@mantine/core";
 
 interface ICreateEntityDialogProps {
   open: boolean;
@@ -44,7 +38,7 @@ function CreateEntityDialog({
       return <></>;
     }
     return (
-      <Alert severity="error" style={{ marginBottom: "2px" }}>
+      <Alert color="red" title="Errors" style={{ marginBottom: "2px" }}>
         {errors.map(({ msg }) => (
           <React.Fragment key={msg}>
             {msg}
@@ -64,7 +58,7 @@ function CreateEntityDialog({
       return <></>;
     }
     return (
-      <Alert severity="warning">
+      <Alert color="orange" title="Warnings">
         {warnings.map(({ msg }) => (
           <React.Fragment key={msg}>
             {msg}
@@ -76,37 +70,38 @@ function CreateEntityDialog({
   }, [errorList]);
 
   return (
-    <Dialog
-      open={open}
+    <Modal
+      opened={open}
       onClose={closeWithHoldForLoading}
-      disableEscapeKeyDown={isLoading}
+      closeOnEscape={!isLoading}
+      padding="md"
+      lockScroll
+      fullScreen={false}
+      title={title}
     >
-      <DialogTitle>{title}</DialogTitle>
-      <DialogContent style={{ paddingTop: ".5em" }}>
-        <DialogContentText>{body}</DialogContentText>
-        {errors}
-        {warnings}
-        {children}
-      </DialogContent>
-      <DialogActions>
+      {errors}
+      {warnings}
+      {children}
+      <br />
+      <Group position="right" spacing="md">
         <Button
           onClick={closeWithHoldForLoading}
           color="error"
-          variant="contained"
+          variant="filled"
           disabled={isLoading}
         >
           Cancel
         </Button>
         <Button
           onClick={onAccept}
-          color="info"
-          variant="contained"
+          color="dev-blue"
+          variant="filled"
           disabled={acceptDisabled || isLoading}
         >
           Create
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Group>
+    </Modal>
   );
 }
 

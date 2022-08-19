@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
-import SearchSelect from "@c/Editor/SearchSelect";
 import { useOrg, addOrgAsDraft } from "./db";
 import CreateEntityDialog from "@c/Dialog/CreateEntityDialog";
-import { Grid, Chip } from "@mui/material";
-import { AccountTree } from "@mui/icons-material";
+import { Grid } from "@mui/material";
+import { IconAffiliate } from "@tabler/icons";
 import TextInput from "@c/Editor/TextInput";
 import showMsg from "@h/msg";
 import { getCommaSeperatedText } from "@c/Company/helper";
 import { IOrgOption } from "./types";
+import Select, { IOption, ISelectedRendererProps } from "@c/Input/Select";
+import RootTag from "@c/Tag/RootTag";
 
 type Props = {
   canCreate?: boolean;
@@ -16,6 +17,9 @@ type Props = {
   companyName?: string;
   onChange: (arr: any) => void;
   values: any[];
+  clearable?: boolean;
+  label?: string;
+  placeholder?: string;
 };
 
 const defaultNewPosition = {
@@ -32,9 +36,11 @@ function OrgSelect({
   canCreate,
   companyName,
   company_id,
-  multiple = true,
+  clearable,
   values,
   onChange,
+  label,
+  placeholder,
 }: Props) {
   const { data, status } = useOrg(company_id);
   const isLoading = status === "loading";
@@ -124,41 +130,51 @@ function OrgSelect({
     return arr;
   }, [data, localPositions, company_id]);
 
+  const labledOptions = useMemo(() => {
+    return dataList.map((x: any) => ({ ...x, value: x.id, label: x.name }));
+  }, [dataList]);
+
+  const valuesMemo = useMemo(() => {
+    return values.map((x) => x.id);
+  }, [values]);
+
   return (
     <>
-      <SearchSelect
-        loadingValues={isLoading}
-        id="orgSelect"
-        name="orgSelect"
-        values={values}
-        onSelect={(allSelected: IOrgOption[]) => onChange(allSelected || [])}
-        label="Organizations"
-        placeholder="Azure"
-        multiple={multiple}
+      <Select
+        clearable={clearable}
+        label={label}
+        size="xs"
+        disabled={isLoading}
+        id="orgSelectMan"
+        name="orgSelectMan"
+        placeholder={isLoading ? "Loading..." : placeholder}
+        options={labledOptions}
+        values={valuesMemo}
+        onSelect={(selected: string[]) => {
+          const arr: any[] = [];
+          for (let i = 0; i < selected.length; i++) {
+            const index = labledOptions.findIndex(
+              (x: IOption) => x.value === selected[i]
+            );
+            if (index !== -1) {
+              arr.push(labledOptions[index]);
+            }
+          }
+          onChange(arr || []);
+        }}
         createClicked={
           canCreate
-            ? () => {
+            ? (name: string) => {
+                setNewPosition({
+                  ...newPosition,
+                  name: name[0].toUpperCase() + name.substring(1),
+                });
                 setCreateOpen(true);
+                return "";
               }
             : undefined
         }
-        options={dataList}
-        renderTags={(value: IOrgOption[], getTagProps) =>
-          value.map((option: IOrgOption, index: number) => (
-            // eslint-disable-next-line react/jsx-key
-            <Chip
-              size="medium"
-              variant="outlined"
-              icon={<AccountTree />}
-              label={option.name}
-              {...getTagProps({ index })}
-            />
-          ))
-        }
-        getOptionLabel={(opt) =>
-          (opt.abbreviation ? `${opt.abbreviation} | ${opt.name}` : opt.name) ||
-          ""
-        }
+        renderValue={OrgSelectTag}
       />
       {canCreate && createOpen && (
         <CreateEntityDialog
@@ -228,7 +244,6 @@ function OrgSelect({
                 }
                 label="Description"
                 placeholder="Cloud computing."
-                isTextField
               />
             </Grid>
           </Grid>
@@ -237,5 +252,23 @@ function OrgSelect({
     </>
   );
 }
+
+const OrgSelectTag = ({
+  label,
+  value,
+  onRemove,
+  ...props
+}: ISelectedRendererProps) => {
+  return (
+    <div {...props}>
+      <RootTag
+        label={label}
+        value={value}
+        onRemove={onRemove}
+        startIcon={<IconAffiliate size="12" />}
+      />
+    </div>
+  );
+};
 
 export default OrgSelect;

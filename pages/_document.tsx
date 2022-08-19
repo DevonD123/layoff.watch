@@ -3,6 +3,9 @@ import Document, { Html, Head, Main, NextScript } from "next/document";
 import createEmotionServer from "@emotion/server/create-instance";
 import theme from "../src/helpers/theme";
 import createEmotionCache from "../src/helpers/createEmotionCache";
+import { createGetInitialProps } from "@mantine/next";
+
+const mantineProps = createGetInitialProps();
 
 export default class MyDocument extends Document {
   render() {
@@ -84,5 +87,6 @@ MyDocument.getInitialProps = async (ctx) => {
   return {
     ...initialProps,
     emotionStyleTags,
+    ...mantineProps(),
   };
 };

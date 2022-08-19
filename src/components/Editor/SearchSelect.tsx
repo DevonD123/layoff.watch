@@ -3,7 +3,6 @@ import {
   Grid,
   Autocomplete,
   TextField,
-  Chip,
   Button,
   AutocompleteRenderGetTagProps,
 } from "@mui/material";
@@ -14,6 +13,10 @@ export enum EntityType {
   Company = "Company",
   Org = "Org",
   Position = "Position",
+}
+export interface ISearchSelectItem {
+  label: string;
+  value: string;
 }
 
 type Props = {
@@ -52,6 +55,7 @@ function SearchSelect({
   defaultValues = [],
   multiple = true,
 }: Props) {
+  const canCreate = typeof createClicked === "function";
   return (
     <Grid container spacing={1} style={{ marginBottom: "1em" }}>
       <Grid item xs>

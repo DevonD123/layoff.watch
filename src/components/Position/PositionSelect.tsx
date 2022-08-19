@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from "react";
-import SearchSelect from "@c/Editor/SearchSelect";
+import React, { useState, useEffect, useMemo } from "react";
 import { usePositions, addPositionAsDraft } from "@h/db";
 import CreateEntityDialog from "@c/Dialog/CreateEntityDialog";
-import { Grid, Chip } from "@mui/material";
-import { Work } from "@mui/icons-material";
+import { Grid } from "@mui/material";
 import TextInput from "@c/Editor/TextInput";
 import showMsg from "@h/msg";
+import Select, { IOption, ISelectedRendererProps } from "@c/Input/Select";
+import RootTag from "@c/Tag/RootTag";
 
 type Props = {
   canCreate?: boolean;
-  multiple?: boolean;
-  showAbbrvWhenSelected?: boolean;
   onChange: (arr: any) => void;
   values: any[];
 };
@@ -25,13 +23,7 @@ const defaultNewPosition = {
   is_draft: true,
 };
 
-function PositionSelect({
-  canCreate,
-  multiple = true,
-  showAbbrvWhenSelected,
-  onChange,
-  values,
-}: Props) {
+function PositionSelect({ canCreate, onChange, values }: Props) {
   const { data, status } = usePositions();
   const isLoading = status === "loading";
   const [localPositions, setLocalPositions] = useState<IPositionOption[]>([]);
@@ -76,7 +68,7 @@ function PositionSelect({
     }
   }
   useEffect(() => {
-    if (createOpen) {
+    if (!createOpen) {
       setNewPosition(defaultNewPosition);
       setErrors([]);
     }
@@ -94,45 +86,43 @@ function PositionSelect({
     }
   }, []);
 
+  const labeledOptions = useMemo(() => {
+    return (data || [])
+      .concat(localPositions)
+      .map((x: any) => ({ ...x, label: x.name, value: x.id }));
+  }, [data, localPositions]);
+
   return (
     <>
-      <SearchSelect
-        loadingValues={isLoading}
-        id="positonSelect"
-        name="positonSelect"
-        values={values}
-        onSelect={(allSelected: IPositionOption[]) =>
-          onChange(allSelected || [])
-        }
+      <Select
+        disabled={isLoading}
+        id="positonSelectMan"
+        name="positonSelectMan"
+        values={values.map((x: any) => x.id)}
+        onSelect={(selected: string[]) => {
+          const arr: any[] = [];
+          for (let i = 0; i < selected.length; i++) {
+            const index = labeledOptions.findIndex(
+              (x: IOption) => x.value === selected[i]
+            );
+            if (index !== -1) {
+              arr.push(labeledOptions[index]);
+            }
+          }
+          onChange(arr || []);
+        }}
         label="Affected Positions"
-        placeholder="Software Engineer"
-        multiple={multiple}
+        placeholder={isLoading ? "Loading..." : "Software Engineer"}
+        options={labeledOptions}
+        renderValue={PositionSelectedChip}
         createClicked={
           canCreate
-            ? () => {
+            ? (text: string) => {
                 setCreateOpen(true);
+                setNewPosition({ ...newPosition, name: text });
+                return "";
               }
             : undefined
-        }
-        options={(data || []).concat(localPositions)}
-        renderTags={(value: IPositionOption[], getTagProps) =>
-          value.map((option: IPositionOption, index: number) => (
-            // eslint-disable-next-line react/jsx-key
-            <Chip
-              size="medium"
-              variant="outlined"
-              icon={<Work />}
-              label={
-                showAbbrvWhenSelected && option.abbreviation
-                  ? option.abbreviation
-                  : option.name
-              }
-              {...getTagProps({ index })}
-            />
-          ))
-        }
-        getOptionLabel={(opt) =>
-          opt.abbreviation ? `${opt.abbreviation} | ${opt.name}` : opt.name
         }
       />
       {canCreate && createOpen && (
@@ -179,5 +169,17 @@ function PositionSelect({
     </>
   );
 }
+export const PositionSelectedChip = ({
+  onRemove,
+  label,
+  value,
+  ...props
+}: ISelectedRendererProps) => {
+  return (
+    <div {...props}>
+      <RootTag label={label} value={value} onRemove={onRemove} />
+    </div>
+  );
+};
 
 export default PositionSelect;

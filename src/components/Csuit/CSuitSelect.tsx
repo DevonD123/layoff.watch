@@ -1,20 +1,27 @@
 import React, { useState, useEffect, useMemo } from "react";
-import SearchSelect from "@c/Editor/SearchSelect";
 import { useCSuitByCompany, addCSuitAsDraft } from "./db";
-import CSuitChip from "./CSuitChip";
 import CreateEntityDialog from "@c/Dialog/CreateEntityDialog";
-import { Chip, Grid } from "@mui/material";
-import TextInput from "@c/Editor/TextInput";
 import showMsg from "@h/msg";
 import { ICSuitOpt, ICsuitLink } from "./types";
+import Select, { IOption, ISelectedRendererProps } from "@c/Input/Select";
+import RootTag from "@c/Tag/RootTag";
+import {
+  Select as SingleSelect,
+  TextInput,
+  Textarea,
+  Grid,
+  Avatar,
+} from "@mantine/core";
 
 type Props = {
   canCreate?: boolean;
-  multiple?: boolean;
   company_id?: string;
   onChange: (arr: any) => void;
   values: any[];
   companyName?: string;
+  clearable?: boolean;
+  label?: string;
+  placeholder?: string;
 };
 const defaultCsuit: ICSuitOpt = {
   id: "__",
@@ -37,10 +44,12 @@ const defaultCSuitLink = {
 function CSuitSelect({
   canCreate,
   company_id,
-  multiple = true,
   values,
   onChange,
   companyName,
+  clearable,
+  label,
+  placeholder,
 }: Props) {
   const { data, status } = useCSuitByCompany(company_id);
   const isLoading = status === "loading";
@@ -135,42 +144,58 @@ function CSuitSelect({
     return arr;
   }, [data, localCsuitLinks, company_id]);
 
+  const labledOptions = useMemo(() => {
+    return dataList.map((x: any) => ({
+      ...x,
+      value: x.company_id + "__" + x.csuit_id,
+      label: x.csuit.name,
+    }));
+  }, [dataList]);
+
+  const valuesMemo = useMemo(() => {
+    return values.map((x) => x.company_id + "__" + x.csuit_id);
+  }, [values]);
+
   return (
     <>
-      <SearchSelect
-        loadingValues={isLoading}
+      <Select
+        clearable={clearable}
+        size="xs"
         id="csuitSelect"
         name="csuitSelect"
-        values={values}
-        onSelect={(allSelected: ICsuitLink[]) => onChange(allSelected || [])}
-        label="Executives"
-        placeholder="Select an exec"
-        multiple={multiple}
-        disabled={!company_id}
+        label={label}
+        placeholder={isLoading ? "Loading..." : placeholder}
+        disabled={!company_id || isLoading}
+        options={labledOptions}
+        values={valuesMemo}
+        onSelect={(selected: string[]) => {
+          const arr: any[] = [];
+          for (let i = 0; i < selected.length; i++) {
+            const index = labledOptions.findIndex(
+              (x: IOption) => x.value === selected[i]
+            );
+            if (index !== -1) {
+              arr.push(labledOptions[index]);
+            }
+          }
+          onChange(arr || []);
+        }}
         createClicked={
           canCreate
-            ? () => {
+            ? (name: string) => {
+                setNewCsuitLink({
+                  ...newCsuitLink,
+                  csuit: {
+                    ...newCsuitLink.csuit,
+                    name: name[0].toUpperCase() + name.substring(1),
+                  },
+                });
                 setCreateOpen(true);
+                return "";
               }
             : undefined
         }
-        options={dataList}
-        renderTags={(value: ICsuitLink[], getTagProps) =>
-          value.map((option: ICsuitLink, index: number) => (
-            // eslint-disable-next-line react/jsx-key
-            <CSuitChip
-              secondaryLabel={option.csuit.role}
-              logoUrl=""
-              label={option.csuit.name}
-              {...getTagProps({ index })}
-            />
-          ))
-        }
-        getOptionLabel={(opt) =>
-          (opt.csuit.role
-            ? `${opt.csuit.role} | ${opt.csuit.name}`
-            : opt.csuit.name) || ""
-        }
+        renderValue={CSuitSelectTag}
       />
       {canCreate && createOpen && (
         <CreateEntityDialog
@@ -184,16 +209,17 @@ function CSuitSelect({
           isLoading={false}
           errorList={errors}
         >
-          <Grid container spacing={1}>
-            <Grid item xs={8}>
+          <Grid>
+            <Grid.Col sm={8}>
               <TextInput
                 id="newName"
                 name="newName"
                 value={newCsuitLink.csuit.name}
-                onChange={(name) => {
-                  let nameUsed = name;
-                  if (name.length >= 1) {
-                    nameUsed = name[0].toUpperCase() + name.substring(1);
+                onChange={(e) => {
+                  let nameUsed = e.target.value;
+                  if (nameUsed.length >= 1) {
+                    nameUsed =
+                      nameUsed[0].toUpperCase() + nameUsed.substring(1);
                   }
                   setNewCsuitLink({
                     ...newCsuitLink,
@@ -205,58 +231,80 @@ function CSuitSelect({
                 }}
                 label="Name"
                 placeholder="John Doe"
-                helperText={"First & Last"}
+                description={"First & Last"}
               />
-            </Grid>
-            <Grid item xs={4}>
-              <SearchSelect
-                id="role"
-                name="role"
-                values={newCsuitLink.csuit.role}
-                onSelect={(allSelected: string) => {
+            </Grid.Col>
+            <Grid.Col
+              sm={4}
+              style={{ display: "flex", alignItems: "flex-end" }}
+            >
+              <SingleSelect
+                label="Role"
+                searchable
+                clearable
+                value={newCsuitLink.csuit.role || null}
+                data={["CEO", "CMO", "CTO"]}
+                onChange={(selected: string) => {
                   setNewCsuitLink({
                     ...newCsuitLink,
                     csuit: {
                       ...newCsuitLink.csuit,
-                      role: allSelected || "",
+                      role: selected || "",
                     },
                   });
                 }}
-                label="Role"
-                placeholder="Select an exec"
-                multiple={false}
-                options={["CEO", "CMO", "CTO"]}
-                renderTags={(value: string[], getTagProps) =>
-                  value.map((option: string, index: number) => (
-                    // eslint-disable-next-line react/jsx-key
-                    <Chip label={option} {...getTagProps({ index })} />
-                  ))
-                }
-                getOptionLabel={(opt: string) => opt || ""}
               />
-            </Grid>
+            </Grid.Col>
 
-            <Grid item xs={12}>
-              <TextInput
+            <Grid.Col xs={12}>
+              <Textarea
                 id="newBio"
                 name="newBio"
                 value={newCsuitLink.csuit.bio || ""}
-                onChange={(bio) =>
+                onChange={(e) =>
                   setNewCsuitLink({
                     ...newCsuitLink,
-                    csuit: { ...newCsuitLink.csuit, bio },
+                    csuit: { ...newCsuitLink.csuit, bio: e.target.value },
                   })
                 }
                 label="Bio"
                 placeholder="Former SWE previosuly manager of the on prem server org."
-                isTextField
               />
-            </Grid>
+            </Grid.Col>
           </Grid>
         </CreateEntityDialog>
       )}
     </>
   );
 }
+
+const CSuitSelectTag = ({
+  label,
+  value,
+  onRemove,
+  csuit,
+  ...props
+}: ISelectedRendererProps & { csuit?: any }) => {
+  const icon = (
+    <Avatar
+      radius="xl"
+      style={{ marginRight: 10, width: 25, height: 25 }}
+      src={csuit.img_url}
+      alt={label}
+      size={15}
+    />
+  );
+  return (
+    <div {...props}>
+      <RootTag
+        label={label}
+        value={value}
+        onRemove={onRemove}
+        startIcon={icon}
+        subLabel={csuit.role}
+      />
+    </div>
+  );
+};
 
 export default CSuitSelect;

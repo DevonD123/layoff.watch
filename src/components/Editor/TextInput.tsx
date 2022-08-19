@@ -1,5 +1,6 @@
 import React from "react";
-import { TextField } from "@mui/material";
+// import { TextField } from "@mui/material";
+import { TextInput as MTextInput } from "@mantine/core";
 
 type Props = {
   id: string;
@@ -8,11 +9,11 @@ type Props = {
   onChange: (val: any) => void;
   label?: string | React.ReactElement;
   placeholder?: string;
-  isTextField?: boolean;
   helperText?: React.ReactElement | string;
   onBlur?: () => void;
   error?: boolean;
   type?: "text" | "number";
+  required?: boolean;
 };
 
 function TextInput({
@@ -22,18 +23,17 @@ function TextInput({
   onChange,
   label,
   placeholder,
-  isTextField,
   helperText,
   onBlur,
   error,
   type,
+  required,
 }: Props) {
   return (
-    <TextField
-      style={{ marginBottom: "1em" }}
-      fullWidth
-      multiline={isTextField}
-      rows={isTextField ? 5 : 1}
+    <MTextInput
+      required={required}
+      // style={{ marginBottom: "1em" }}
+      // fullWidth
       label={label}
       id={id}
       name={name}
@@ -41,7 +41,7 @@ function TextInput({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      helperText={helperText}
+      description={helperText}
       onBlur={onBlur}
       error={error}
     />

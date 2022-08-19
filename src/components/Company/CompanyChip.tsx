@@ -26,7 +26,6 @@ function CompanyChip({ logoUrl, label, ...props }: Props) {
         <Avatar>
           {logoUrl ? (
             <Image
-              //   loader={myLoader}
               src={`${logoUrl}?size=${size}&format=png`}
               alt={label}
               width={size}

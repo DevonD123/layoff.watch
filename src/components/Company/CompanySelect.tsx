@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import SearchSelect from "@c/Editor/SearchSelect";
 import { useCompanies, addCompanyAsDraft } from "./db";
 import CompanyChip from "./CompanyChip";
@@ -9,13 +9,15 @@ import Image from "next/image";
 import showMsg from "@h/msg";
 import { ICompanyOption } from "./types";
 import { getCommaSeperatedText } from "./helper";
+import Select, { IOption, ISelectedRendererProps } from "@c/Input/Select";
+import { Avatar } from "@mantine/core";
+import RootTag from "@c/Tag/RootTag";
 
 type Props = {
   canCreate?: boolean;
-  multiple?: boolean;
-  showAbbrvWhenSelected?: boolean;
   onChange: (arr: any) => void;
   values: any[];
+  filterIds?: string[];
 };
 
 const defaultNewCompany = {
@@ -28,13 +30,7 @@ const defaultNewCompany = {
   is_draft: true,
 };
 
-function CompanySelect({
-  canCreate,
-  multiple = true,
-  onChange,
-  values,
-  showAbbrvWhenSelected = false,
-}: Props) {
+function CompanySelect({ canCreate, onChange, values, filterIds }: Props) {
   const { data, status } = useCompanies();
   const isLoading = status === "loading";
   // const [selectedCompany, setSelectedCompany] = useState<ICompanyOption[]>([]);
@@ -84,7 +80,7 @@ function CompanySelect({
     }
   }
   useEffect(() => {
-    if (createOpen) {
+    if (!createOpen) {
       setNewCompany(defaultNewCompany);
       setErrors([]);
     }
@@ -101,47 +97,56 @@ function CompanySelect({
       }
     }
   }, []);
+  const labledOptions = useMemo(() => {
+    const res: any[] = (data || []).concat(localCompanies);
 
+    if (filterIds && filterIds.length >= 1) {
+      return res
+        .filter((x) => !filterIds.includes(x.id))
+        .map((x: any) => ({ ...x, value: x.id, label: x.name }));
+    }
+
+    return res.map((x: any) => ({ ...x, value: x.id, label: x.name }));
+  }, [data, localCompanies, filterIds]);
+
+  const valuesMemo = useMemo(() => {
+    return values.map((x) => x.id);
+  }, [values]);
   return (
     <>
-      <SearchSelect
-        loadingValues={isLoading}
-        id="companySelect"
-        name="companySelect"
-        // values={selectedCompany}
-        values={values}
-        onSelect={(allSelected: ICompanyOption[]) =>
-          // setSelectedCompany(allSelected || [])
-          onChange(allSelected || [])
-        }
+      <Select
         label="Companies"
-        placeholder="Microsoft"
-        multiple={multiple}
+        disabled={isLoading}
+        id="companySelectMan"
+        name="companySelectMan"
+        placeholder={isLoading ? "Loading..." : "Search Companies"}
+        options={labledOptions}
+        values={valuesMemo}
+        onSelect={(selected: string[]) => {
+          const arr: any[] = [];
+          for (let i = 0; i < selected.length; i++) {
+            const index = labledOptions.findIndex(
+              (x: IOption) => x.value === selected[i]
+            );
+            if (index !== -1) {
+              arr.push(labledOptions[index]);
+            }
+          }
+          onChange(arr || []);
+        }}
         createClicked={
           canCreate
-            ? () => {
+            ? (name: string) => {
+                setNewCompany({
+                  ...newCompany,
+                  name: name[0].toUpperCase() + name.substring(1),
+                });
                 setCreateOpen(true);
+                return "";
               }
             : undefined
         }
-        options={(data || []).concat(localCompanies)}
-        renderTags={(value: ICompanyOption[], getTagProps) =>
-          value.map((option: ICompanyOption, index: number) => (
-            // eslint-disable-next-line react/jsx-key
-            <CompanyChip
-              logoUrl={option.logo_url}
-              label={
-                showAbbrvWhenSelected && option.ticker
-                  ? option.ticker
-                  : option.name
-              }
-              {...getTagProps({ index })}
-            />
-          ))
-        }
-        getOptionLabel={(opt) =>
-          opt.ticker ? `${opt.ticker} | ${opt.name}` : opt.name
-        }
+        renderValue={CompanySelectTag}
       />
       {canCreate && createOpen && (
         <CreateEntityDialog
@@ -287,7 +292,7 @@ function CompanySelect({
                 }
                 label="Description"
                 placeholder="Global diversified tech company."
-                isTextField
+                // TODO
               />
             </Grid>
           </Grid>
@@ -296,5 +301,36 @@ function CompanySelect({
     </>
   );
 }
+
+const CompanySelectTag = ({
+  label,
+  value,
+  onRemove,
+  ticker,
+  logo_url,
+  ...props
+}: ISelectedRendererProps & { ticker?: string; logo_url?: string }) => {
+  const icon = logo_url ? (
+    <Avatar
+      style={{ marginRight: 10 }}
+      src={`${logo_url}?size=${15}&format=png`}
+      alt={label}
+      size={15}
+    />
+  ) : (
+    <></>
+  );
+  return (
+    <div {...props}>
+      <RootTag
+        label={label}
+        value={value}
+        onRemove={onRemove}
+        subLabel={ticker}
+        startIcon={icon}
+      />
+    </div>
+  );
+};
 
 export default CompanySelect;

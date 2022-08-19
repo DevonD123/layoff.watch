@@ -9,6 +9,11 @@ import createEmotionCache from "../src/helpers/createEmotionCache";
 import { MsgProvider } from "@h/msg";
 import { ConcentProvider, didConcent } from "@h/cookieconcent";
 import { QueryClientProvider } from "@h/db/helper";
+import {
+  MantineProvider,
+  ColorScheme,
+  ColorSchemeProvider,
+} from "@mantine/core";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -27,12 +32,34 @@ export default function MyApp(props: MyAppProps) {
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
       <QueryClientProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <ConcentProvider />
-          <MsgProvider />
-          <Comp {...pageProps} />
-        </ThemeProvider>
+        <MantineProvider
+          theme={{
+            colorScheme: "light",
+            colors: {
+              "dev-blue": [
+                "#288ba8",
+                "#288ba8",
+                "#288ba8",
+                "#288ba8",
+                "#288ba8",
+                "#288ba8",
+                "#288ba8",
+                "#288ba8",
+                "#288ba8",
+                "#288ba8",
+              ],
+            },
+          }}
+          withGlobalStyles
+          withNormalizeCSS
+        >
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <ConcentProvider />
+            <MsgProvider />
+            <Comp {...pageProps} />
+          </ThemeProvider>
+        </MantineProvider>
       </QueryClientProvider>
     </CacheProvider>
   );
