@@ -14,6 +14,7 @@ export function usePositions() {
       .from("position")
       .select()
       .eq("is_draft", false)
+      .eq("deleted", false)
       .then(handleVisibleGenericErr)
   );
 }

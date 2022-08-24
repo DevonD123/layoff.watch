@@ -17,12 +17,12 @@ function CreateEntityDialog({
   onClose,
   onAccept,
   title,
-  body,
   children,
   isLoading,
   acceptDisabled,
   errorList,
 }: React.PropsWithChildren<ICreateEntityDialogProps>) {
+  console.log("dialog status ", open);
   function closeWithHoldForLoading() {
     if (isLoading) {
       return;
@@ -98,7 +98,7 @@ function CreateEntityDialog({
           variant="filled"
           disabled={acceptDisabled || isLoading}
         >
-          Create
+          Save
         </Button>
       </Group>
     </Modal>

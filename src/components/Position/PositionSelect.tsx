@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { usePositions, addPositionAsDraft } from "@h/db";
 import CreateEntityDialog from "@c/Dialog/CreateEntityDialog";
-import { Grid } from "@mui/material";
+import { Grid } from "@mantine/core";
 import TextInput from "@c/Editor/TextInput";
 import showMsg from "@h/msg";
 import Select, { IOption, ISelectedRendererProps } from "@c/Input/Select";
@@ -13,6 +13,7 @@ type Props = {
   values: any[];
 };
 export interface IPositionOption {
+  id?: string;
   name: string;
   abbreviation?: string;
   is_draft: boolean;
@@ -135,8 +136,8 @@ function PositionSelect({ canCreate, onChange, values }: Props) {
           isLoading={false}
           errorList={errors}
         >
-          <Grid container spacing={1}>
-            <Grid item xs={8}>
+          <Grid>
+            <Grid.Col xs={8}>
               <TextInput
                 id="newName"
                 name="newName"
@@ -147,8 +148,8 @@ function PositionSelect({ canCreate, onChange, values }: Props) {
                 label="Title"
                 placeholder="Software Engineer"
               />
-            </Grid>
-            <Grid item xs={4}>
+            </Grid.Col>
+            <Grid.Col xs={4}>
               <TextInput
                 id="newAbbreviation"
                 name="newAbbreviation"
@@ -162,7 +163,7 @@ function PositionSelect({ canCreate, onChange, values }: Props) {
                 label="Abreviation"
                 placeholder="SWE"
               />
-            </Grid>
+            </Grid.Col>
           </Grid>
         </CreateEntityDialog>
       )}

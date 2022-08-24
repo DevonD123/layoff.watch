@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useMemo } from "react";
-import SearchSelect from "@c/Editor/SearchSelect";
 import { useCompanies, addCompanyAsDraft } from "./db";
-import CompanyChip from "./CompanyChip";
 import CreateEntityDialog from "@c/Dialog/CreateEntityDialog";
-import { Grid, Typography } from "@mui/material";
 import TextInput from "@c/Editor/TextInput";
 import Image from "next/image";
 import showMsg from "@h/msg";
 import { ICompanyOption } from "./types";
 import { getCommaSeperatedText } from "./helper";
 import Select, { IOption, ISelectedRendererProps } from "@c/Input/Select";
-import { Avatar } from "@mantine/core";
+import { Avatar, Grid, Text } from "@mantine/core";
 import RootTag from "@c/Tag/RootTag";
+import CompanyAddEditDialog from "./CompanyAddEditDialog";
 
 type Props = {
   canCreate?: boolean;
@@ -40,19 +38,13 @@ function CompanySelect({ canCreate, onChange, values, filterIds }: Props) {
   const [newCompany, setNewCompany] =
     useState<ICompanyOption>(defaultNewCompany);
 
-  const [previewUrl, setPreviewUrl] = useState("");
-  const [errors, setErrors] = useState<
-    { msg: string; sev?: "error" | "warning" }[]
-  >([]);
   async function acceptCreate() {
     if (!canCreate) return setCreateOpen(false);
 
     const errors = [];
     if (!newCompany.name) {
-      errors.push({ msg: "Company name is required" });
+      errors.push("Company name is required");
     }
-
-    setErrors(errors);
 
     if (errors.length <= 0) {
       const res = await addCompanyAsDraft({
@@ -77,12 +69,15 @@ function CompanySelect({ canCreate, onChange, values, filterIds }: Props) {
           showMsg(`You have added ${res.name} to our database!`, "success");
         }
       }
+    } else {
+      for (let i = 0; i < errors.length; i++) {
+        showMsg(errors[i]);
+      }
     }
   }
   useEffect(() => {
     if (!createOpen) {
       setNewCompany(defaultNewCompany);
-      setErrors([]);
     }
   }, [createOpen]);
 
@@ -149,154 +144,19 @@ function CompanySelect({ canCreate, onChange, values, filterIds }: Props) {
         renderValue={CompanySelectTag}
       />
       {canCreate && createOpen && (
-        <CreateEntityDialog
+        <CompanyAddEditDialog
+          data={newCompany}
           onAccept={acceptCreate}
-          onClose={() => setCreateOpen(false)}
-          open={createOpen}
-          title="Add a company to our database"
-          body=""
-          isLoading={false}
-          errorList={errors}
-        >
-          <Grid container spacing={1}>
-            <Grid item xs={12}>
-              <TextInput
-                id="newName"
-                name="newName"
-                value={newCompany.name}
-                onChange={(name) => {
-                  if (name.length >= 1) {
-                    const char1 = name[0].toUpperCase();
-                    setNewCompany({
-                      ...newCompany,
-                      name: char1 + name.substring(1),
-                    });
-                  } else {
-                    setNewCompany({ ...newCompany, name });
-                  }
-                }}
-                label="Company Name"
-                placeholder="Microsoft"
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextInput
-                id="newTicker"
-                name="newTicker"
-                value={newCompany.ticker || ""}
-                onChange={(ticker) => {
-                  if (ticker[0] && !/[a-zA-Z1-9]/.test(ticker[0])) {
-                    return;
-                  }
-                  setNewCompany({
-                    ...newCompany,
-                    ticker: ticker.toUpperCase(),
-                  });
-                }}
-                label="Stock Symbol"
-                placeholder="MSFT"
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextInput
-                id="newEstEmployeeCount"
-                name="newEstEmployeeCount"
-                value={newCompany.est_employee_count || ""}
-                onChange={(est_employee_count) => {
-                  const result = getCommaSeperatedText(est_employee_count);
-                  if (result !== null) {
-                    setNewCompany({
-                      ...newCompany,
-                      est_employee_count: result,
-                    });
-                  }
-                }}
-                label="Estimated Employees"
-                placeholder="221,000"
-              />
-            </Grid>
-            <Grid item xs={8}>
-              <TextInput
-                id="newLogoUrl"
-                name="newLogoUrl"
-                value={newCompany.logo_url || ""}
-                onChange={(logo_url) =>
-                  setNewCompany({
-                    ...newCompany,
-                    logo_url: logo_url.split(" ").join("").trim(),
-                  })
-                }
-                label="Domain Name"
-                helperText="eg. company.com | preview shows once you click away"
-                placeholder="microsoft.com"
-                onBlur={() => {
-                  if (
-                    newCompany.logo_url &&
-                    newCompany.logo_url.includes(".") &&
-                    newCompany.logo_url.length >= 3 &&
-                    !newCompany.logo_url.includes("/")
-                  ) {
-                    setPreviewUrl(
-                      `https://logo.clearbit.com/${newCompany.logo_url}`
-                    );
-                  } else {
-                    setPreviewUrl("");
-                    setNewCompany({
-                      ...newCompany,
-                      logo_url: "",
-                    });
-                    showMsg(
-                      'Invalid domain make sure it does not have any special characters and has a single "." with atleast 3 characters'
-                    );
-                  }
-                }}
-              />
-            </Grid>
-            <Grid
-              item
-              xs={4}
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "flex-start",
-              }}
-            >
-              {previewUrl && (
-                <Image
-                  src={`${previewUrl}?size=50&format=png`}
-                  width={50}
-                  height={50}
-                  alt={"company logo"}
-                />
-              )}
-              {!previewUrl && (
-                <div
-                  style={{
-                    height: 50,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography>Logo Preview...</Typography>
-                </div>
-              )}
-            </Grid>
-            <Grid item xs={12}>
-              <TextInput
-                id="newDescription"
-                name="newDescription"
-                value={newCompany.description || ""}
-                onChange={(description) =>
-                  setNewCompany({ ...newCompany, description })
-                }
-                label="Description"
-                placeholder="Global diversified tech company."
-                // TODO
-              />
-            </Grid>
-          </Grid>
-        </CreateEntityDialog>
+          onClose={() => {
+            setCreateOpen(false);
+            setNewCompany(defaultNewCompany);
+          }}
+          isOpen={createOpen}
+          onChange={(val, field) =>
+            setNewCompany({ ...newCompany, [field]: val })
+          }
+          isCreateMode
+        />
       )}
     </>
   );

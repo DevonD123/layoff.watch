@@ -1,7 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { handleVisibleGenericErr } from "@h/db/helper";
+import {
+  handleVisibleGenericErr,
+  handleVisibleGenericErrWithCount,
+} from "@h/db/helper";
 import showMsg from "@h/msg";
 import { supabase } from "@h/supabaseClient";
+import { getRangeValues } from "@h/pghelper";
 import { ICSuitInput } from "./types";
 
 export function useCSuitByCompanies(company_ids: string[]) {
@@ -12,10 +16,27 @@ export function useCSuitByCompanies(company_ids: string[]) {
         .from("csuit")
         .select()
         .eq("is_draft", false)
+        .eq("deleted", false)
         .then(handleVisibleGenericErr),
     {
       enabled: company_ids && company_ids.length >= 1,
     }
+  );
+}
+export function usePagedCsuit(page?: number) {
+  return useQuery(
+    ["csuit_paged", { page }],
+    async () => {
+      const range = getRangeValues(page || 1);
+      const response = await supabase
+        .from("csuit")
+        .select(`*`, { count: "exact" })
+        .eq("deleted", false)
+        .order("created_at")
+        .range(range[0], range[1]);
+      return handleVisibleGenericErrWithCount(response);
+    },
+    { enabled: typeof page !== "undefined", keepPreviousData: true }
   );
 }
 
@@ -28,6 +49,7 @@ export function useCSuitByCompany(company_id?: string) {
         .select(`*, csuit(*)`)
         .eq("is_draft", false)
         .eq("company_id", company_id)
+        .eq("deleted", false)
         .then(handleVisibleGenericErr),
     { enabled: !!company_id }
   );

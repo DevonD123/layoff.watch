@@ -1,9 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import CompanySelect from "@c/Company/CompanySelect";
-import PositionSelect, {
-  IPositionOption,
-  PositionSelectedChip,
-} from "@c/Position/PositionSelect";
+import PositionSelect, { IPositionOption } from "@c/Position/PositionSelect";
 import CSuitSelect from "@c/Csuit/CSuitSelect";
 import OrgSelect from "@c/Org/OrgSelect";
 import {
@@ -20,7 +17,6 @@ import {
   Container,
   Grid,
   Tooltip,
-  Chip,
   TextInput,
   Textarea,
   Group,
@@ -47,6 +43,7 @@ import Editor from "@c/Editor/DynamicEditor";
 import HtmlContent from "./HtmlContent";
 import StandAloneTag from "@c/Tag/StandAloneTag";
 import { useRouter } from "next/router";
+import getControls from "@c/Editor/getControls";
 
 const metaDescHelper = (desc: string) => {
   if (!desc) {
@@ -102,6 +99,7 @@ function CreateArticle({ isAdmin, isDraft, isOwner }: Props) {
   const [metadesc, setMetaDesc] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const { color, msg } = metaDescHelper(metadesc);
+  const controls = useMemo(() => getControls(isAdmin), [isAdmin]);
 
   useEffect(() => {
     if (title) {
@@ -138,7 +136,7 @@ function CreateArticle({ isAdmin, isDraft, isOwner }: Props) {
     <article style={{ display: "flex", height: "100%", position: "relative" }}>
       <Container>
         <Grid>
-          <Grid.Col xs={12} md={8}>
+          <Grid.Col xs={12}>
             {isPreview ? (
               <Title order={1} align="center">
                 <Text color={title ? "inherit" : "red"}>
@@ -163,7 +161,7 @@ function CreateArticle({ isAdmin, isDraft, isOwner }: Props) {
             )}
           </Grid.Col>
           <Divider style={{ width: "100%" }} />
-          <Grid.Col xs={12} md={4} style={{ paddingTop: 15 }}>
+          <Grid.Col md={12} style={{ paddingTop: 15 }}>
             <Grid style={{ paddingTop: 0 }}>
               <Grid.Col
                 xs={4}
@@ -210,7 +208,7 @@ function CreateArticle({ isAdmin, isDraft, isOwner }: Props) {
           </Grid.Col>
           <Grid.Col xs={12}>
             {isPreview ? (
-              currentContent ? (
+              curentContent ? (
                 <HtmlContent html={curentContent} />
               ) : (
                 <Text color="red" align="center">
@@ -218,7 +216,12 @@ function CreateArticle({ isAdmin, isDraft, isOwner }: Props) {
                 </Text>
               )
             ) : (
-              <Editor value={curentContent} onChange={setCurrentContent} />
+              <Editor
+                value={curentContent}
+                onChange={setCurrentContent}
+                controls={controls}
+                sticky={true}
+              />
             )}
           </Grid.Col>
           <Grid.Col xs={12} style={{ paddingBottom: 0 }}>
@@ -293,7 +296,7 @@ function CreateArticle({ isAdmin, isDraft, isOwner }: Props) {
                 >
                   {isPreview ? (
                     <Group style={{ marginTop: 2 }}>
-                      {companyInfo[company_id].csuit.map((x) => (
+                      {companyInfo[company_id].csuit.map((x: any) => (
                         <StandAloneTag
                           key={x.csuit.id}
                           label={x.csuit.name}
@@ -332,7 +335,7 @@ function CreateArticle({ isAdmin, isDraft, isOwner }: Props) {
                   )}
                   {isPreview ? (
                     <Group style={{ marginTop: 2 }}>
-                      {companyInfo[company_id].org.map((x) => (
+                      {companyInfo[company_id].org.map((x: any) => (
                         <StandAloneTag
                           key={x.id}
                           label={x.name}
@@ -510,10 +513,9 @@ function CreateArticle({ isAdmin, isDraft, isOwner }: Props) {
           <Grid.Col xs={12} />
           {isAdmin && !isPreview && (
             <>
-              <Grid.Col xs={12} md={8}>
+              <Grid.Col xs={12}>
                 <SectionTitle title="Meta Data" id="admin" />
               </Grid.Col>
-              <Grid.Col xs={12} md={4}></Grid.Col>
               <Grid.Col xs={12}>
                 <TextInput
                   variant="unstyled"

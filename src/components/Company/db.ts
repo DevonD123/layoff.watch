@@ -1,9 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { handleVisibleGenericErr } from "@h/db/helper";
+import {
+  handleVisibleGenericErr,
+  handleVisibleGenericErrWithCount,
+} from "@h/db/helper";
 import showMsg from "@h/msg";
 import { supabase } from "@h/supabaseClient";
 import { ICompanyInput } from "./types";
 import { getValueForWholeNumber } from "./helper";
+import { getRangeValues } from "@h/pghelper";
 
 export function useCompanies() {
   return useQuery(["company"], () =>
@@ -11,7 +15,37 @@ export function useCompanies() {
       .from("company")
       .select()
       .eq("is_draft", false)
+      .eq("deleted", false)
       .then(handleVisibleGenericErr)
+  );
+}
+
+export function useCompanyRecentLayoffs() {
+  return useQuery(["company_recent"], () =>
+    supabase
+      .from("company")
+      .select()
+      .eq("is_draft", false)
+      .eq("deleted", false)
+      .limit(10)
+      .then(handleVisibleGenericErr)
+  );
+}
+
+export function usePagedCompanies(page?: number) {
+  return useQuery(
+    ["company_paged", { page }],
+    async () => {
+      const range = getRangeValues(page || 1);
+      const response = await supabase
+        .from("company")
+        .select(`*`, { count: "exact" })
+        .eq("deleted", false)
+        .order("created_at")
+        .range(range[0], range[1]);
+      return handleVisibleGenericErrWithCount(response);
+    },
+    { enabled: typeof page !== "undefined", keepPreviousData: true }
   );
 }
 

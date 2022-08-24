@@ -1,9 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { handleVisibleGenericErr } from "@h/db/helper";
+import {
+  handleVisibleGenericErr,
+  handleVisibleGenericErrWithCount,
+} from "@h/db/helper";
 import showMsg from "@h/msg";
 import { supabase } from "@h/supabaseClient";
 import { IOrgInput } from "./types";
 import { getValueForWholeNumber } from "@c/Company/helper";
+import { getRangeValues } from "@h/pghelper";
 
 export function useOrg(company_id?: string) {
   return useQuery(
@@ -13,8 +17,26 @@ export function useOrg(company_id?: string) {
         .from("org")
         .select()
         .eq("is_draft", false)
+        .eq("deleted", false)
         .then(handleVisibleGenericErr),
     { enabled: !!company_id }
+  );
+}
+
+export function usePagedOrgs(page?: number) {
+  return useQuery(
+    ["csuit_paged", { page }],
+    async () => {
+      const range = getRangeValues(page || 1);
+      const response = await supabase
+        .from("org")
+        .select(`*, company(name,id)`, { count: "exact" })
+        .eq("deleted", false)
+        .order("created_at")
+        .range(range[0], range[1]);
+      return handleVisibleGenericErrWithCount(response);
+    },
+    { enabled: typeof page !== "undefined", keepPreviousData: true }
   );
 }
 

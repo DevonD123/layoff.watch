@@ -1,44 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import type { NextPage } from "next";
-import ClickToEdit, { IEditToggleInputState } from "@c/Input/ClickToEdit";
+import MainLayout from "@c/Layout";
+import { Title, Text } from "@mantine/core";
+import RecentLayoffsCard from "@c/Company/RecentLayoffsCard";
 
 const Home: NextPage = () => {
-  const [inputState, setInputState] = useState<IEditToggleInputState>({
-    value: "",
-    isEdit: false,
-    placeholder: "Title",
-  });
-  const [inputState2, setInputState2] = useState<IEditToggleInputState>({
-    value: "",
-    isEdit: false,
-    placeholder: "Title",
-  });
-
   return (
-    <>
-      <article style={{ width: "80%", margin: "1em auto" }}>
-        <ClickToEdit
-          canEdit
-          showPlaceholder
-          textElement={"xl"}
-          setEdit={(isEdit: boolean) => {
-            setInputState({ ...inputState, isEdit });
-          }}
-          onChange={(value: any) => setInputState({ ...inputState, value })}
-          {...inputState}
-        />
-        <ClickToEdit
-          canEdit
-          showPlaceholder
-          textElement={"md"}
-          setEdit={(isEdit: boolean) => {
-            setInputState2({ ...inputState2, isEdit });
-          }}
-          onChange={(value: any) => setInputState2({ ...inputState2, value })}
-          {...inputState2}
-        />
-      </article>
-    </>
+    <MainLayout>
+      <Title order={1} align="center">
+        Layoff Watch
+      </Title>
+      <Text size="md" color="dimmed" component="h2" align="center">
+        See which companies and executives have a history of laying off
+        employees
+      </Text>
+      <RecentLayoffsCard />
+    </MainLayout>
   );
 };
 

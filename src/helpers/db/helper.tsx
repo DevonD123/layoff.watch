@@ -38,6 +38,19 @@ export function handleVisibleGenericErr(response: any) {
   }
   return response.data;
 }
+interface ICountDataResult {
+  rows: any[];
+  count: number;
+}
+export function handleVisibleGenericErrWithCount(
+  response: any
+): ICountDataResult {
+  if (response.error) {
+    showMsg("Something went wrong please try again later.", "error");
+    throw response.error;
+  }
+  return { rows: response.data, count: response.count };
+}
 
 export const client = new QueryClient();
 
@@ -45,7 +58,7 @@ export function QueryClientProvider({ children }: QProps) {
   return (
     <QueryClientProviderBase client={client}>
       {children}
-      <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProviderBase>
   );
 }

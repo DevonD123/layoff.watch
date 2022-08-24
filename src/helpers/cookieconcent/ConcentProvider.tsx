@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import CookieConsent from "react-cookie-consent";
-import { Typography, useTheme } from "@mui/material";
+import { useMantineTheme, MantineTheme, Text } from "@mantine/core";
 import didConcent from "./didConcent";
 import Script from "next/script";
 
 type Props = {};
 
 export default function ConcentProvider({}: Props) {
-  const theme = useTheme();
+  const theme: MantineTheme = useMantineTheme();
   const [firstLoadBypass, setfirstLoadBypass] = useState(false);
   return (
     <>
@@ -18,24 +18,44 @@ export default function ConcentProvider({}: Props) {
         disableButtonStyles
         customButtonProps={{
           style: {
-            marginLeft: theme.spacing(2),
-            marginRight: theme.spacing(2),
-            backgroundColor: theme.palette.info.main,
-            color: theme.palette.info.contrastText,
-            border: `1px solid ${theme.palette.info.main}`,
+            marginLeft: theme.spacing.md,
+            marginRight: theme.spacing.md,
+            backgroundColor:
+              theme.colorScheme === "dark"
+                ? theme.colors.green[5]
+                : theme.colors.green[1],
+            color:
+              theme.colorScheme === "dark"
+                ? theme.colors.white[5]
+                : theme.colors.gray[1],
+            border: `1px solid ${
+              theme.colorScheme === "dark"
+                ? theme.colors.green[8]
+                : theme.colors.green[5]
+            }`,
             cursor: "pointer",
-            padding: theme.spacing(1),
-            borderRadius: theme.shape.borderRadius,
+            padding: theme.spacing.sm,
+            borderRadius: theme.radius.sm,
           },
         }}
         customDeclineButtonProps={{
           style: {
-            backgroundColor: theme.palette.error.main,
-            color: theme.palette.error.contrastText,
-            border: `1px solid ${theme.palette.error.main}`,
+            backgroundColor:
+              theme.colorScheme === "dark"
+                ? theme.colors.red[5]
+                : theme.colors.red[1],
+            color:
+              theme.colorScheme === "dark"
+                ? theme.colors.white[5]
+                : theme.colors.gray[1],
+            border: `1px solid ${
+              theme.colorScheme === "dark"
+                ? theme.colors.red[8]
+                : theme.colors.red[5]
+            }`,
             cursor: "pointer",
-            padding: theme.spacing(0.75),
-            borderRadius: theme.shape.borderRadius,
+            padding: theme.spacing.xs,
+            borderRadius: theme.radius.sm,
           },
         }}
         buttonClasses="btn-hov"
@@ -44,9 +64,9 @@ export default function ConcentProvider({}: Props) {
           setfirstLoadBypass(true);
         }}
       >
-        <Typography component="span">
+        <Text component="span">
           This website uses cookies to enhance the user experience.
-        </Typography>
+        </Text>
       </CookieConsent>
       {!firstLoadBypass && didConcent() && (
         <Script

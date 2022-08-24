@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useOrg, addOrgAsDraft } from "./db";
 import CreateEntityDialog from "@c/Dialog/CreateEntityDialog";
-import { Grid } from "@mui/material";
 import { IconAffiliate } from "@tabler/icons";
+import { Grid } from "@mantine/core";
 import TextInput from "@c/Editor/TextInput";
 import showMsg from "@h/msg";
 import { getCommaSeperatedText } from "@c/Company/helper";
@@ -188,8 +188,8 @@ function OrgSelect({
           isLoading={false}
           errorList={errors}
         >
-          <Grid container spacing={1}>
-            <Grid item xs={12}>
+          <Grid>
+            <Grid.Col xs={12}>
               <TextInput
                 id="newName"
                 name="newName"
@@ -200,8 +200,8 @@ function OrgSelect({
                 label="Org Name"
                 placeholder="Cloud"
               />
-            </Grid>
-            <Grid item xs={6}>
+            </Grid.Col>
+            <Grid.Col xs={6}>
               <TextInput
                 id="newAbbreviation"
                 name="newAbbreviation"
@@ -215,8 +215,8 @@ function OrgSelect({
                 label="Abreviation"
                 placeholder="CLD"
               />
-            </Grid>
-            <Grid item xs={6}>
+            </Grid.Col>
+            <Grid.Col xs={6}>
               <TextInput
                 id="newEstEmployeeCount"
                 name="newEstEmployeeCount"
@@ -233,8 +233,8 @@ function OrgSelect({
                 label="Estimated Employees"
                 placeholder="3,000"
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Grid.Col>
+            <Grid.Col xs={12}>
               <TextInput
                 id="newDescription"
                 name="newDescription"
@@ -245,7 +245,7 @@ function OrgSelect({
                 label="Description"
                 placeholder="Cloud computing."
               />
-            </Grid>
+            </Grid.Col>
           </Grid>
         </CreateEntityDialog>
       )}

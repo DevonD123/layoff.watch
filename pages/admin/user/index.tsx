@@ -2,16 +2,16 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import AdminNavbar from "@c/Navbar/AdminNavbar";
 
-const Home: NextPage = () => {
+const User: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Admin home</title>
+        <title>Users</title>
       </Head>
       <AdminNavbar />
-      Home - add a dashbaord
+      Users
     </>
   );
 };
 
-export default Home;
+export default User;

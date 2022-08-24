@@ -1,36 +1,51 @@
-import Router from "next/router";
-import QSP from "../qsp";
+import { showNotification, cleanNotifications } from "@mantine/notifications";
+
+const notificationColorAdapter = {
+  error: "red",
+  warning: "orange",
+  success: "green",
+  info: "blue",
+};
+type notificationStatus = "error" | "warning" | "success" | "info";
 
 export default function showMsg(
-  msg: string,
-  type?: "error" | "warning" | "success" | "info",
-  redirectTo?: string
+  message: string,
+  type?: notificationStatus,
+  title?: string
 ) {
-  Router.push(
-    {
-      pathname: redirectTo || Router.pathname,
-      query: {
-        ...Router.query,
-        [QSP.sev]: type || "error",
-        [QSP.msg]: encodeURI(msg),
-      },
-    },
-    undefined,
-    { shallow: redirectTo ? false : true }
-  );
+  showNotification({
+    message,
+    title,
+    color: notificationColorAdapter[type || "error"],
+    autoClose: 3000,
+  });
 }
 
-export function closeMsg() {
-  const query = Router.query || {};
-  delete query[QSP.sev];
-  delete query[QSP.msg];
-
-  Router.push(
-    {
-      pathname: Router.pathname,
-      query,
-    },
-    undefined,
-    { shallow: true }
+export const showStatusBasedMsg = (status: number, msg?: string) => {
+  showMsg(
+    msg || (status >= 400 ? "Error somethign happened" : "Success"),
+    status <= 300 ? "success" : "error"
   );
+};
+
+export const showFetchResult = async (
+  fetchResultPreJson: any,
+  onSuccessCallback?: (jsonRes: any) => void,
+  onFailCallback?: (status: number, jsonRes: any) => void
+) => {
+  const json = await fetchResultPreJson.json();
+  showStatusBasedMsg(fetchResultPreJson.status, json?.msg);
+  if (fetchResultPreJson.ok) {
+    if (onSuccessCallback) {
+      return onSuccessCallback(json);
+    }
+  } else {
+    if (onFailCallback) {
+      return onFailCallback(fetchResultPreJson.status, json);
+    }
+  }
+};
+
+export function closeMsg() {
+  cleanNotifications();
 }

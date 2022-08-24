@@ -12,10 +12,19 @@ export default function HtmlContent({ html }: { html?: string }) {
         console.clear();
         console.log(`You clicked ${origin.href}`);
         const didAccept = window.confirm(
-          `Are you sure you want to openthis url? ${origin.href}`
+          `Are you sure you want to openthis url we can not verify if it is safe or not? ${origin.href}`
         );
-        if (didAccept && typeof window !== "undefined" && origin?.href) {
-          window.open(origin.href, "_blank").focus();
+        if (
+          didAccept &&
+          window &&
+          typeof window.open &&
+          origin &&
+          origin.href
+        ) {
+          const res = window.open(origin.href, "_blank");
+          if (res) {
+            res.focus();
+          }
         }
       }
     };

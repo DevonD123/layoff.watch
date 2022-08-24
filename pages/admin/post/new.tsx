@@ -1,17 +1,18 @@
+import CreateArticleForm from "@c/Article/CreateArticle";
 import type { NextPage } from "next";
 import Head from "next/head";
 import AdminNavbar from "@c/Navbar/AdminNavbar";
 
-const Home: NextPage = () => {
+const Post: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Admin home</title>
+        <title>New Post</title>
       </Head>
       <AdminNavbar />
-      Home - add a dashbaord
+      <CreateArticleForm isAdmin isDraft isOwner />
     </>
   );
 };
 
-export default Home;
+export default Post;
