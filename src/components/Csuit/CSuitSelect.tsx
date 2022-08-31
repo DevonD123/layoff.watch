@@ -11,6 +11,7 @@ import {
   Textarea,
   Grid,
   Avatar,
+  FileInput,
 } from "@mantine/core";
 
 type Props = {
@@ -22,6 +23,7 @@ type Props = {
   clearable?: boolean;
   label?: string;
   placeholder?: string;
+  dropdownPosition?: "bottom" | "top" | "flip";
 };
 const defaultCsuit: ICSuitOpt = {
   id: "__",
@@ -50,12 +52,14 @@ function CSuitSelect({
   clearable,
   label,
   placeholder,
+  dropdownPosition = "bottom",
 }: Props) {
   const { data, status } = useCSuitByCompany(company_id);
   const isLoading = status === "loading";
   const [localCsuitLinks, setLocalCsuitLinks] = useState<ICsuitLink[]>([]);
 
   const [createOpen, setCreateOpen] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
   const [newCsuitLink, setNewCsuitLink] =
     useState<ICsuitLink>(defaultCSuitLink);
 
@@ -83,13 +87,15 @@ function CSuitSelect({
         bio: newCsuitLink.csuit.bio,
         role: newCsuitLink.csuit.role,
         company_id,
+        file: file || undefined,
       });
 
       if (res) {
         const allLocalCsuitLinks = [...localCsuitLinks, res];
-        setLocalCsuitLinks(allLocalCsuitLinks);
-        onChange([...values, res]);
+        const onChangeVals = [...values, res];
         setCreateOpen(false);
+        setLocalCsuitLinks(allLocalCsuitLinks);
+        onChange(onChangeVals);
         localStorage.setItem(
           "local_draft_csuit",
           JSON.stringify(allLocalCsuitLinks)
@@ -101,7 +107,7 @@ function CSuitSelect({
     }
   }
   useEffect(() => {
-    if (createOpen) {
+    if (!createOpen) {
       setNewCsuitLink(defaultCSuitLink);
       setErrors([]);
     }
@@ -144,30 +150,31 @@ function CSuitSelect({
     return arr;
   }, [data, localCsuitLinks, company_id]);
 
-  const labledOptions = useMemo(() => {
-    return dataList.map((x: any) => ({
-      ...x,
-      value: x.company_id + "__" + x.csuit_id,
-      label: x.csuit.name,
-    }));
-  }, [dataList]);
-
-  const valuesMemo = useMemo(() => {
-    return values.map((x) => x.company_id + "__" + x.csuit_id);
-  }, [values]);
+  const labledOptions = dataList.map((x: any) => ({
+    ...x,
+    value: x.company_id + "__" + x.csuit_id,
+    label: x.csuit.name,
+  }));
 
   return (
     <>
       <Select
+        dropdownPosition={dropdownPosition}
         clearable={clearable}
         size="xs"
         id="csuitSelect"
         name="csuitSelect"
         label={label}
-        placeholder={isLoading ? "Loading..." : placeholder}
+        placeholder={
+          !company_id
+            ? "Select a company first"
+            : isLoading
+            ? "Loading..."
+            : placeholder
+        }
         disabled={!company_id || isLoading}
         options={labledOptions}
-        values={valuesMemo}
+        values={(values || []).map((x) => x.company_id + "__" + x.csuit_id)}
         onSelect={(selected: string[]) => {
           const arr: any[] = [];
           for (let i = 0; i < selected.length; i++) {
@@ -183,13 +190,9 @@ function CSuitSelect({
         createClicked={
           canCreate
             ? (name: string) => {
-                setNewCsuitLink({
-                  ...newCsuitLink,
-                  csuit: {
-                    ...newCsuitLink.csuit,
-                    name: name[0].toUpperCase() + name.substring(1),
-                  },
-                });
+                const newData = { ...defaultCSuitLink };
+                newData.csuit.name = name[0].toUpperCase() + name.substring(1);
+                setNewCsuitLink(newData);
                 setCreateOpen(true);
                 return "";
               }
@@ -269,6 +272,18 @@ function CSuitSelect({
                 }
                 label="Bio"
                 placeholder="Former SWE previosuly manager of the on prem server org."
+              />
+            </Grid.Col>
+
+            <Grid.Col xs={12}>
+              <FileInput
+                label="Profile Pic"
+                accept="image/png,image/jpeg"
+                placeholder="Upload profile image"
+                value={file}
+                onChange={(files) => {
+                  setFile(files ? files : null);
+                }}
               />
             </Grid.Col>
           </Grid>

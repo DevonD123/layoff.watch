@@ -7,17 +7,23 @@ const notificationColorAdapter = {
   info: "blue",
 };
 type notificationStatus = "error" | "warning" | "success" | "info";
-
+const closeTimes = {
+  short: 2000,
+  normal: 3000,
+  long: 5000,
+  extraLong: 8000,
+};
 export default function showMsg(
   message: string,
   type?: notificationStatus,
-  title?: string
+  title?: SVGFESpecularLightingElement,
+  autoClose?: "short" | "normal" | "long" | "extraLong"
 ) {
   showNotification({
     message,
     title,
     color: notificationColorAdapter[type || "error"],
-    autoClose: 3000,
+    autoClose: closeTimes[autoClose || "normal"],
   });
 }
 

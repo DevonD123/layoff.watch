@@ -11,6 +11,7 @@ type Props = {
   canCreate?: boolean;
   onChange: (arr: any) => void;
   values: any[];
+  dropdownPosition?: "bottom" | "top" | "flip";
 };
 export interface IPositionOption {
   id?: string;
@@ -24,7 +25,12 @@ const defaultNewPosition = {
   is_draft: true,
 };
 
-function PositionSelect({ canCreate, onChange, values }: Props) {
+function PositionSelect({
+  canCreate,
+  onChange,
+  values,
+  dropdownPosition = "bottom",
+}: Props) {
   const { data, status } = usePositions();
   const isLoading = status === "loading";
   const [localPositions, setLocalPositions] = useState<IPositionOption[]>([]);
@@ -96,6 +102,7 @@ function PositionSelect({ canCreate, onChange, values }: Props) {
   return (
     <>
       <Select
+        dropdownPosition={dropdownPosition}
         disabled={isLoading}
         id="positonSelectMan"
         name="positonSelectMan"

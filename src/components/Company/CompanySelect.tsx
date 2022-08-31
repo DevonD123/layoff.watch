@@ -16,6 +16,9 @@ type Props = {
   onChange: (arr: any) => void;
   values: any[];
   filterIds?: string[];
+  isSingleSelect?: boolean;
+  dropdownPosition?: "bottom" | "top" | "flip";
+  required?: boolean;
 };
 
 const defaultNewCompany = {
@@ -28,7 +31,15 @@ const defaultNewCompany = {
   is_draft: true,
 };
 
-function CompanySelect({ canCreate, onChange, values, filterIds }: Props) {
+function CompanySelect({
+  canCreate,
+  onChange,
+  values,
+  filterIds,
+  isSingleSelect,
+  dropdownPosition = "bottom",
+  required,
+}: Props) {
   const { data, status } = useCompanies();
   const isLoading = status === "loading";
   // const [selectedCompany, setSelectedCompany] = useState<ICompanyOption[]>([]);
@@ -104,19 +115,19 @@ function CompanySelect({ canCreate, onChange, values, filterIds }: Props) {
     return res.map((x: any) => ({ ...x, value: x.id, label: x.name }));
   }, [data, localCompanies, filterIds]);
 
-  const valuesMemo = useMemo(() => {
-    return values.map((x) => x.id);
-  }, [values]);
   return (
     <>
       <Select
-        label="Companies"
+        required={required}
+        dropdownPosition={dropdownPosition}
+        clearable={!isSingleSelect}
+        label={isSingleSelect ? "Company" : "Companies"}
         disabled={isLoading}
         id="companySelectMan"
         name="companySelectMan"
         placeholder={isLoading ? "Loading..." : "Search Companies"}
         options={labledOptions}
-        values={valuesMemo}
+        values={values.map((x) => x.id)}
         onSelect={(selected: string[]) => {
           const arr: any[] = [];
           for (let i = 0; i < selected.length; i++) {
@@ -127,7 +138,12 @@ function CompanySelect({ canCreate, onChange, values, filterIds }: Props) {
               arr.push(labledOptions[index]);
             }
           }
-          onChange(arr || []);
+          if (isSingleSelect) {
+            const val = arr[arr.length - 1];
+            onChange(val ? [val] : []);
+          } else {
+            onChange(arr || []);
+          }
         }}
         createClicked={
           canCreate

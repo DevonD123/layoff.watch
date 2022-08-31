@@ -1,20 +1,29 @@
 import React from "react";
 import type { NextPage } from "next";
 import MainLayout from "@c/Layout";
-import { Title, Text } from "@mantine/core";
-import RecentLayoffsCard from "@c/Company/RecentLayoffsCard";
+import { Title, Text, Skeleton } from "@mantine/core";
+import dynamic from "next/dynamic";
+import RecentBar from "@c/Recent";
+
+const Chart = dynamic(() => import("@c/Chart/LayoffLineChart"), {
+  ssr: false,
+  loading: () => <Skeleton height="100%" width="100%" animate />,
+}) as any;
 
 const Home: NextPage = () => {
   return (
     <MainLayout>
-      <Title order={1} align="center">
-        Layoff Watch
-      </Title>
-      <Text size="md" color="dimmed" component="h2" align="center">
+      <RecentBar />
+      <Text size={"md"} component="h1" align="center">
+        Layoffs to date
+      </Text>
+      <Text size="xs" color="dimmed" component="h2" align="center">
         See which companies and executives have a history of laying off
         employees
       </Text>
-      <RecentLayoffsCard />
+      <div style={{ height: "50vh", width: "100%", margin: "0 auto" }}>
+        <Chart />
+      </div>
     </MainLayout>
   );
 };

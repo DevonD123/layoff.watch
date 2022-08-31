@@ -4,35 +4,42 @@ import {
   Navbar,
   Header,
   Footer,
-  //   Aside,
   Text,
   MediaQuery,
-  Burger,
   useMantineTheme,
   Group,
   ActionIcon,
+  Button,
+  Drawer,
 } from "@mantine/core";
 import {
   IconBrandApple,
   IconIdBadge,
-  IconReportMedical,
   IconChartInfographic,
+  IconUserCircle,
+  IconLockAccess,
 } from "@tabler/icons";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import ClientLayoffForm from "@c/Layoff/ClientLayoffForm";
+import { useUser } from "@supabase/auth-helpers-react";
+import { User } from "@supabase/supabase-js";
+
 interface IProps extends PropsWithChildren<{}> {}
 
 const mobileBreakPoint = "sm";
-const Pages = ({ currentPath }: { currentPath: string }) => {
+const Pages = ({ currentPath, user }: { currentPath: string; user?: User }) => {
   return (
     <Group position="apart">
       <Link href="/" passHref>
         <ActionIcon
           variant="transparent"
           component="a"
-          disabled={currentPath === "/"}
+          disabled={currentPath === "/company"}
         >
-          <IconBrandApple color={currentPath === "/" ? "blue" : undefined} />
+          <IconBrandApple
+            color={currentPath === "/company" ? "blue" : undefined}
+          />
         </ActionIcon>
       </Link>
       <Link href="/exec" passHref>
@@ -55,20 +62,30 @@ const Pages = ({ currentPath }: { currentPath: string }) => {
           />
         </ActionIcon>
       </Link>
-      <ActionIcon
-        variant="transparent"
-        component="a"
-        onClick={() => alert("Report")}
-      >
-        <IconReportMedical />
-      </ActionIcon>
+      <Link href={user ? "/account" : "/auth"} passHref>
+        <ActionIcon variant="transparent" component="a">
+          {user ? (
+            <IconUserCircle
+              color={currentPath === "/account" ? "blue" : undefined}
+            />
+          ) : (
+            <IconLockAccess
+              color={currentPath.includes("/auth") ? "blue" : undefined}
+            />
+          )}
+        </ActionIcon>
+      </Link>
     </Group>
   );
 };
 const MainLayout = ({ children }: IProps) => {
   const router = useRouter();
   const theme = useMantineTheme();
+  const { user, error } = useUser();
+  const [openReportLayoff, setopenReportLayoff] = useState(false);
   const [opened, setOpened] = useState(false);
+
+  const closeReportLayoff = () => setopenReportLayoff(false);
   return (
     <AppShell
       styles={{
@@ -88,8 +105,12 @@ const MainLayout = ({ children }: IProps) => {
           hidden={!opened}
           width={{ sm: 200, lg: 300 }}
         >
-          <Text>Application navbar</Text>
-          <Pages currentPath={router.pathname} />
+          <Link href="/" passHref>
+            <Text weight={700} component="a">
+              Layoff Watch
+            </Text>
+          </Link>
+          <Pages currentPath={router.pathname} user={user} />
         </Navbar>
       }
       //   aside={
@@ -102,7 +123,7 @@ const MainLayout = ({ children }: IProps) => {
       footer={
         <MediaQuery largerThan={mobileBreakPoint} styles={{ display: "none" }}>
           <Footer height={60} p="md">
-            <Pages currentPath={router.pathname} />
+            <Pages currentPath={router.pathname} user={user} />
           </Footer>
         </MediaQuery>
       }
@@ -111,24 +132,38 @@ const MainLayout = ({ children }: IProps) => {
           <div
             style={{ display: "flex", alignItems: "center", height: "100%" }}
           >
-            <Text>Application header</Text>
-            <MediaQuery
-              largerThan={mobileBreakPoint}
-              styles={{ display: "none" }}
+            <Link href="/" passHref>
+              <Text weight={700} component="a">
+                Layoff Watch
+              </Text>
+            </Link>
+            <Button
+              color="pink"
+              ml="auto"
+              mr="0"
+              onClick={() => setopenReportLayoff(true)}
             >
-              <Burger
-                opened={opened}
-                onClick={() => setOpened((o) => !o)}
-                size="sm"
-                color={theme.colors.gray[6]}
-                style={{ marginRight: 0, marginLeft: "auto" }}
-              />
-            </MediaQuery>
+              Report a Layoff
+            </Button>
           </div>
         </Header>
       }
     >
       {children}
+      <Drawer
+        position="bottom"
+        opened={openReportLayoff}
+        onClose={closeReportLayoff}
+        title={"Report a layoff"}
+        padding="md"
+        size="xl"
+      >
+        <ClientLayoffForm
+          user={user}
+          open={openReportLayoff}
+          onClose={closeReportLayoff}
+        />
+      </Drawer>
     </AppShell>
   );
 };

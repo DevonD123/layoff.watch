@@ -2,6 +2,8 @@ import * as React from "react";
 import Head from "next/head";
 import { AppProps } from "next/app";
 import { CacheProvider, EmotionCache } from "@emotion/react";
+import { UserProvider } from "@supabase/auth-helpers-react";
+import { supabaseClient } from "@supabase/auth-helpers-nextjs";
 import theme from "../src/helpers/theme";
 import createEmotionCache from "../src/helpers/createEmotionCache";
 import { ConcentProvider, didConcent } from "@h/cookieconcent";
@@ -26,12 +28,14 @@ export default function MyApp(props: MyAppProps) {
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
       <QueryClientProvider>
-        <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
-          <NotificationsProvider>
-            <ConcentProvider />
-            <Comp {...pageProps} />
-          </NotificationsProvider>
-        </MantineProvider>
+        <UserProvider supabaseClient={supabaseClient}>
+          <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
+            <NotificationsProvider>
+              <ConcentProvider />
+              <Comp {...pageProps} />
+            </NotificationsProvider>
+          </MantineProvider>
+        </UserProvider>
       </QueryClientProvider>
     </CacheProvider>
   );

@@ -22,7 +22,6 @@ function CreateEntityDialog({
   acceptDisabled,
   errorList,
 }: React.PropsWithChildren<ICreateEntityDialogProps>) {
-  console.log("dialog status ", open);
   function closeWithHoldForLoading() {
     if (isLoading) {
       return;

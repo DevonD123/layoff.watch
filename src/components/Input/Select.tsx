@@ -19,6 +19,8 @@ export interface IProps {
   ) => React.ReactElement;
   clearable?: boolean;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
+  dropdownPosition?: "bottom" | "top" | "flip";
+  required?: boolean;
 }
 export interface IOption {
   label: string;
@@ -42,11 +44,15 @@ function Select({
   onSelect,
   renderValue,
   clearable = true,
+  dropdownPosition = "bottom",
+  required,
   size,
 }: IProps) {
   const canCreate = typeof createClicked === "function";
   return (
     <MSelect
+      required={required}
+      dropdownPosition={dropdownPosition}
       size={size}
       clearable={clearable}
       variant="unstyled"
