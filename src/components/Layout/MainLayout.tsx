@@ -12,18 +12,20 @@ import {
   Button,
   Drawer,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import {
   IconBrandApple,
   IconIdBadge,
-  IconChartInfographic,
   IconUserCircle,
   IconLockAccess,
+  IconHome,
 } from "@tabler/icons";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import ClientLayoffForm from "@c/Layoff/ClientLayoffForm";
 import { useUser } from "@supabase/auth-helpers-react";
 import { User } from "@supabase/supabase-js";
+import RecentBar from "@c/Recent";
 
 interface IProps extends PropsWithChildren<{}> {}
 
@@ -32,6 +34,15 @@ const Pages = ({ currentPath, user }: { currentPath: string; user?: User }) => {
   return (
     <Group position="apart">
       <Link href="/" passHref>
+        <ActionIcon
+          variant="transparent"
+          component="a"
+          disabled={currentPath === "/"}
+        >
+          <IconHome color={currentPath === "/" ? "blue" : undefined} />
+        </ActionIcon>
+      </Link>
+      <Link href="/company" passHref>
         <ActionIcon
           variant="transparent"
           component="a"
@@ -49,17 +60,6 @@ const Pages = ({ currentPath, user }: { currentPath: string; user?: User }) => {
           disabled={currentPath === "/exec"}
         >
           <IconIdBadge color={currentPath === "/exec" ? "blue" : undefined} />
-        </ActionIcon>
-      </Link>
-      <Link href="/stats" passHref>
-        <ActionIcon
-          variant="transparent"
-          component="a"
-          disabled={currentPath === "/stats"}
-        >
-          <IconChartInfographic
-            color={currentPath === "/stats" ? "blue" : undefined}
-          />
         </ActionIcon>
       </Link>
       <Link href={user ? "/account" : "/auth"} passHref>
@@ -85,15 +85,13 @@ const MainLayout = ({ children }: IProps) => {
   const [openReportLayoff, setopenReportLayoff] = useState(false);
   const [opened, setOpened] = useState(false);
 
+  const isSmall = useMediaQuery("(max-width: 600px)");
   const closeReportLayoff = () => setopenReportLayoff(false);
   return (
     <AppShell
       styles={{
         main: {
-          background:
-            theme.colorScheme === "dark"
-              ? theme.colors.dark[8]
-              : theme.colors.gray[0],
+          background: theme.colors.lightBg[0],
         },
       }}
       navbarOffsetBreakpoint={mobileBreakPoint}
@@ -128,15 +126,25 @@ const MainLayout = ({ children }: IProps) => {
         </MediaQuery>
       }
       header={
-        <Header height={70} p="md">
+        <Header height={isSmall ? 110 : 70} p="md">
           <div
-            style={{ display: "flex", alignItems: "center", height: "100%" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              width: "100%",
+              marginBottom: 5,
+            }}
           >
             <Link href="/" passHref>
               <Text weight={700} component="a">
                 Layoff Watch
               </Text>
             </Link>
+            {!isSmall && (
+              <div style={{ width: "50%", maxWidth: 350, margin: "0 auto" }}>
+                {/* <RecentBar /> TODO share subscription */}
+              </div>
+            )}
             <Button
               color="pink"
               ml="auto"
@@ -146,6 +154,7 @@ const MainLayout = ({ children }: IProps) => {
               Report a Layoff
             </Button>
           </div>
+          <RecentBar />
         </Header>
       }
     >

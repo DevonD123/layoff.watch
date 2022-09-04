@@ -7,6 +7,7 @@ import showMsg from "@h/msg";
 import { supabase } from "@h/supabaseClient";
 import { getRangeValues } from "@h/pghelper";
 import { IReportData } from "./types";
+import { supabaseClient } from "@supabase/auth-helpers-nextjs";
 
 export async function addLayoffAsDraft({
   title,
@@ -108,4 +109,24 @@ export async function addLayoffAsDraft({
     "long"
   );
   return data[0];
+}
+
+export function useLayoutPgData(id: string) {
+  return useQuery(
+    ["layout", { id }],
+    () =>
+      supabaseClient
+        .from("layoff")
+        .select(
+          `*,
+          company(*),
+          position_layoff(position(*)),
+          csuit_layoff(csuit(*))
+        `
+        )
+        .eq("id", id)
+        .single()
+        .then(handleVisibleGenericErr),
+    { enabled: !!id }
+  );
 }

@@ -12,3 +12,21 @@ export function useRecentCompany() {
     {}
   );
 }
+
+export function fetchLayoffById(id: string) {
+  return supabaseClient
+    .from("layoff")
+    .select(
+      `
+               id,
+               title,
+               company_id,
+               number,
+               layoff_date,
+               percent,
+               company(name,logo_url)
+    `
+    )
+    .eq("id", id)
+    .single();
+}

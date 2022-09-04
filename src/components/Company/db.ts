@@ -73,3 +73,33 @@ export async function addCompanyAsDraft({
 
   return data[0];
 }
+
+export function useMinimalCompanyList() {
+  return useQuery(
+    ["useMinimalCompanyList"],
+    () => supabase.rpc("company_list_minimal").then(handleVisibleGenericErr),
+    {}
+  );
+}
+
+export function useCompanyById(id: String) {
+  return useQuery(
+    ["useCompanyById", { id }],
+    () =>
+      supabase
+        .from("company")
+        .select(
+          `
+        *,
+        company_csuit(
+          start,end,
+          csuit(*)
+        )
+        `
+        )
+        .eq("id", id)
+        .single()
+        .then(handleVisibleGenericErr),
+    { enabled: !!id }
+  );
+}

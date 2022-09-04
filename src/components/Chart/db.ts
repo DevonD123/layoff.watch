@@ -12,3 +12,14 @@ export function useLayoffMSummary() {
     {}
   );
 }
+
+export function useCompanyLayoffHistory(id: string) {
+  return useQuery(
+    ["useCompanyLayoffHistory", { id }],
+    () =>
+      supabaseClient
+        .rpc("company_layoff_total", { c_id: id })
+        .then(handleVisibleGenericErr),
+    { enabled: !!id }
+  );
+}

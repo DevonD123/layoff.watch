@@ -1,9 +1,8 @@
 import React from "react";
 import type { NextPage } from "next";
 import MainLayout from "@c/Layout";
-import { Title, Text, Skeleton } from "@mantine/core";
+import { Text, Skeleton } from "@mantine/core";
 import dynamic from "next/dynamic";
-import RecentBar from "@c/Recent";
 
 const Chart = dynamic(() => import("@c/Chart/LayoffLineChart"), {
   ssr: false,
@@ -13,7 +12,6 @@ const Chart = dynamic(() => import("@c/Chart/LayoffLineChart"), {
 const Home: NextPage = () => {
   return (
     <MainLayout>
-      <RecentBar />
       <Text size={"md"} component="h1" align="center">
         Layoffs to date
       </Text>
