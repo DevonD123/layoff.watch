@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import type { NextPage } from "next";
 import MainLayout from "@c/Layout";
-import { Skeleton, Text, Title, Anchor, Button } from "@mantine/core";
+import { Skeleton, Text, Title, Anchor } from "@mantine/core";
 import { useRouter } from "next/router";
-import { useLayoutPgData } from "@c/Layoff/db";
+import { useLayoffPgData } from "@c/Layoff/db";
 import { IconExternalLink, IconInfoCircle } from "@tabler/icons";
 import Link from "next/link";
 import PositionDisplayLinkList from "@c/Position/PositionDisplayLinkList";
@@ -14,11 +14,13 @@ import moment from "moment";
 import ReportButton from "@c/ReportButton/ReportButton";
 import MoreInfoButton from "@c/MoreInfoButton/MoreInfoButton";
 import CompanyLayoffHistoryLineChart from "@c/Chart/CompanyLayoffHistoryLineChart";
+import { ReportType } from "@c/Layoff/types";
+import getCompltedStatusIcon from "@h/getCompletedStatusIcon";
 
 const Home: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { data, isLoading } = useLayoutPgData(id as string);
+  const { data, isLoading } = useLayoffPgData(id as string);
   return (
     <MainLayout>
       <Head>
@@ -31,14 +33,22 @@ const Home: NextPage = () => {
       {isLoading ? (
         <Skeleton />
       ) : (
-        <Text size="xl" color="red">
-          {data.number} Employees Laid off
-          {data.percent && (
-            <Text color="dimmed" size="sm" component="span">
-              {" "}
-              ({data.percent}% of workforce)
-            </Text>
-          )}
+        <ReportTypeTile
+          type={data.type}
+          is_completed={data.is_completed}
+          number={data.number}
+          percent={data.percent}
+        />
+      )}
+      {isLoading ? (
+        <Skeleton />
+      ) : !data.extra_info ? null : (
+        <Text>
+          In affect {moment(data.layoff_date).startOf("day").fromNow()}
+          <Text color="dimmed" component="span">
+            {" "}
+            ({moment(data.layoff_date).format("M/d/yyyy")})
+          </Text>
         </Text>
       )}
       {isLoading ? (
@@ -77,13 +87,6 @@ const Home: NextPage = () => {
         </CompanySection>
       )}
       <div style={{ height: 20, width: 20 }} />
-      {isLoading ? (
-        <Skeleton />
-      ) : !data.extra_info ? null : (
-        <Text>
-          Reported {moment(data.layoff_date).startOf("day").fromNow()}
-        </Text>
-      )}
 
       {isLoading ? (
         <Skeleton />
@@ -115,6 +118,74 @@ const Home: NextPage = () => {
       {!isLoading && <MoreInfoButton id={id as string} type="layoff" />}
       {!isLoading && <ReportButton id={id as string} type="layoff" />}
     </MainLayout>
+  );
+};
+
+const ReportTypeTile = ({
+  type,
+  is_completed,
+  number,
+  percent,
+}: {
+  type: ReportType;
+  is_completed: boolean;
+  number?: number;
+  percent?: number;
+}) => {
+  if (type === ReportType.Layoff) {
+    return (
+      <Text size="xl" color="red">
+        {number} Employees Laid off
+        {percent && (
+          <Text color="dimmed" size="sm" component="span">
+            {" "}
+            ({percent}% of workforce)
+          </Text>
+        )}
+      </Text>
+    );
+  }
+
+  if (type === ReportType.Pip) {
+    return (
+      <div>
+        <Text size="xl" color={is_completed ? "green" : "orange"}>
+          {getCompltedStatusIcon(is_completed)}
+          PIP{" "}
+          {is_completed
+            ? "removed!"
+            : `introduced with a target of ${percent}%`}
+        </Text>
+        {
+          /* TODO */ <Link href="/faq/pip" passHref>
+            <Anchor>What is a pip?</Anchor>
+          </Link>
+        }
+      </div>
+    );
+  }
+
+  if (type === ReportType.Freeze) {
+    return (
+      <div>
+        <Text size="xl" color={is_completed ? "green" : "orange"}>
+          {getCompltedStatusIcon(is_completed)}
+          {is_completed ? "Hiring started!" : `Hiring freeze started.`}
+        </Text>
+
+        {false /* TODO */ && (
+          <Link href="/jobs" passHref>
+            <Anchor>See jobs from companies still looking to hire!</Anchor>
+          </Link>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <Text size="xl" color="red">
+      Error invalid page
+    </Text>
   );
 };
 

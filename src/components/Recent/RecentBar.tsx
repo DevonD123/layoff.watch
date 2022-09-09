@@ -204,7 +204,7 @@ const RecentBar = ({}: Props) => {
                   </Text>
                 </div>
                 <div className={classes.container}>
-                  <Link href={`/layoff/${newLayoff.layoff_id}`} passHref>
+                  <Link href={`/report/${newLayoff.layoff_id}`} passHref>
                     <Text
                       size="sm"
                       color="black"
@@ -297,7 +297,7 @@ const RecentBar = ({}: Props) => {
                   }
                 >
                   <div style={{ display: "flex", flexDirection: "column" }}>
-                    <Link href={`/layoff/${x.layoff_id}`} passHref>
+                    <Link href={`/report/${x.layoff_id}`} passHref>
                       <Text
                         size="sm"
                         color="black"

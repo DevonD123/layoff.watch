@@ -1,8 +1,18 @@
 import React, { PropsWithChildren } from "react";
 import Link from "next/link";
-import { Avatar, Text, Box } from "@mantine/core";
-import { IconLink } from "@tabler/icons";
+import {
+  Avatar,
+  Text,
+  Box,
+  ThemeIcon,
+  Group,
+  Badge,
+  Skeleton,
+} from "@mantine/core";
+import { IconChartBar, IconLink, IconSnowflake } from "@tabler/icons";
 import Card from "@c/Card/Card";
+import { useTopPipAndFreeze } from "./db";
+import { ReportType } from "@c/Layoff/types";
 
 interface Props extends PropsWithChildren<{}> {
   id: string;
@@ -24,6 +34,15 @@ export default function CompanySection({
   hasLink = true,
   children,
 }: Props) {
+  const { data, isLoading } = useTopPipAndFreeze(id);
+  const pipIndex =
+    data &&
+    data.length >= 1 &&
+    data.findIndex((x: any) => x.type === ReportType.Pip && !x.is_complete);
+  const freezeIndex =
+    data &&
+    data.length >= 1 &&
+    data.findIndex((x: any) => x.type === ReportType.Freeze && !x.is_complete);
   return (
     <Card>
       {hasLink ? (
@@ -67,6 +86,63 @@ export default function CompanySection({
           </Text>
         </Bubble>
       )}
+      <div>
+        <Group position="center" mt={15}>
+          {isLoading ? (
+            <Skeleton width={75} height={25} radius="lg" />
+          ) : (
+            <Badge
+              size="lg"
+              radius="xl"
+              // color="orange"
+              color={pipIndex ? "orange" : "green"}
+              pl={0}
+              leftSection={<IconChartBar size={15} />}
+              styles={{
+                leftSection: {
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              }}
+            >
+              <span
+                style={{
+                  textTransform: "none",
+                }}
+              >
+                {pipIndex ? `PIP ${data[pipIndex].percent}% target` : `No PIP`}
+              </span>
+            </Badge>
+          )}
+          {isLoading ? (
+            <Skeleton width={75} height={25} radius="lg" />
+          ) : (
+            <Badge
+              size="lg"
+              radius="xl"
+              color={freezeIndex ? "orange" : "green"}
+              pl={0}
+              styles={{
+                leftSection: {
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              }}
+              leftSection={<IconSnowflake size={15} />}
+            >
+              <span
+                style={{
+                  textTransform: "none",
+                }}
+              >
+                {freezeIndex ? `Hiring Freeze` : `Hiring`}
+              </span>
+            </Badge>
+          )}
+        </Group>
+      </div>
 
       {children && <div style={{ marginTop: 20 }}>{children}</div>}
     </Card>

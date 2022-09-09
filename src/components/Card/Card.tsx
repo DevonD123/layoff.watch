@@ -4,13 +4,21 @@ import { Card as MCard, Title } from "@mantine/core";
 type Props = {
   isDark?: boolean;
   title?: string;
+  startIcon?: JSX.Element;
+  isSmall?: boolean;
 };
 
-function Card({ children, isDark, title }: PropsWithChildren<Props>) {
+function Card({
+  children,
+  isDark,
+  title,
+  startIcon,
+  isSmall,
+}: PropsWithChildren<Props>) {
   return (
     <MCard
       sx={(theme) => ({
-        minHeight: 200,
+        minHeight: isSmall ? 50 : 200,
         width: "100%",
         display: "flex",
         flexDirection: "column",
@@ -23,13 +31,14 @@ function Card({ children, isDark, title }: PropsWithChildren<Props>) {
     >
       {title && (
         <Title
-          order={3}
+          order={isSmall ? 5 : 3}
           align="left"
           sx={{
             marginTop: 0,
             marginRight: 15,
           }}
         >
+          {startIcon}
           {title}
         </Title>
       )}

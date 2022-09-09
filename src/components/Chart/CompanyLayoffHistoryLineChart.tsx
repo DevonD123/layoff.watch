@@ -1,22 +1,17 @@
 import React, { useMemo } from "react";
-// import {
-//   LineChart,
-//   Line,
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   Legend,
-// } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
 import { useMantineTheme, Text } from "@mantine/core";
 import { useCompanyLayoffHistory } from "./db";
 import Card from "@c/Card/Card";
-import dynamic from "next/dynamic";
-
-const Recharts = dynamic(() => import("recharts"), {
-  ssr: false,
-}) as any;
-
+import { IconFlame } from "@tabler/icons";
 interface IData {
   yr: number;
   layoffs: number;
@@ -70,40 +65,42 @@ const LayoffLineChart = ({ id }: { id: string }) => {
 
     return arr;
   }, [data]);
-  if (!dataTransformed || dataTransformed.length <= 0) {
-    return (
-      <Card isDark title="Layoff history">
+  return (
+    <Card
+      isSmall={!dataTransformed || dataTransformed.length <= 0}
+      isDark
+      title="Layoff history"
+      startIcon={<IconFlame />}
+    >
+      {!dataTransformed || dataTransformed.length <= 0 ? (
         <Text size="md" align="center" color="green">
           No reported layoffs
         </Text>
-      </Card>
-    );
-  }
-  return (
-    <Card isDark title="Layoff history">
-      <Recharts.LineChart
-        width={300}
-        height={400}
-        data={dataTransformed}
-        margin={{
-          top: 5,
-          right: 10,
-          left: 0,
-          bottom: 5,
-        }}
-      >
-        <Recharts.CartesianGrid strokeDasharray="3 3" />
-        <Recharts.XAxis dataKey="yr" />
-        <Recharts.YAxis />
-        <Recharts.Tooltip />
-        <Recharts.Legend />
-        <Recharts.Line
-          type="monotone"
-          dataKey="layoffs"
-          stroke={theme.colors[theme.primaryColor][5]}
-          activeDot={{ r: 8 }}
-        />
-      </Recharts.LineChart>
+      ) : (
+        <LineChart
+          width={300}
+          height={400}
+          data={dataTransformed}
+          margin={{
+            top: 5,
+            right: 10,
+            left: 0,
+            bottom: 5,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="yr" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Line
+            type="monotone"
+            dataKey="layoffs"
+            stroke={theme.colors[theme.primaryColor][5]}
+            activeDot={{ r: 8 }}
+          />
+        </LineChart>
+      )}
     </Card>
   );
 };

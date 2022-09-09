@@ -27,7 +27,10 @@ begin
                 li.* 
               FROM 
                 layoff li
-              where li.company_id = company.id and li.layoff_date is not null
+              where 
+                li.company_id = company.id and 
+                li.layoff_date is not null and
+                li.type = 1
               ORDER BY 
                 li.layoff_date 
               DESC LIMIT 1

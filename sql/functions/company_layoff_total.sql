@@ -16,6 +16,7 @@ begin
               layoff_date is not null
               and layoff_date <= CURRENT_DATE
               and company_id = c_id
+              and type = 1
             group by DATE_TRUNC('year',layoff_date)
             order by DATE_TRUNC('year',layoff_date);
 end; $$ 

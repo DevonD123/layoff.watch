@@ -4,7 +4,7 @@ import { supabaseClient } from "@supabase/auth-helpers-nextjs";
 import showMsg from "@h/msg";
 
 interface Props {
-  type: "layoff" | "company" | "csuit";
+  type: "layoff" | "company" | "csuit" | "position";
   id: string;
 }
 

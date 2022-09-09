@@ -19,6 +19,7 @@ begin
             where 
               layoff_date is not null
               and (layoff_date >= (CURRENT_DATE - interval '2 years') AND layoff_date <= CURRENT_DATE)
+              and type = 1
             group by DATE_TRUNC('month',layoff_date)
             order by DATE_TRUNC('month',layoff_date);
 end; $$ 

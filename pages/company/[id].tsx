@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import type { NextPage } from "next";
 import MainLayout from "@c/Layout";
 import { Skeleton, Text, Collapse, Anchor } from "@mantine/core";
-import { IconArrowDownCircle } from "@tabler/icons";
+import { IconArrowDownCircle, IconId } from "@tabler/icons";
 import { useRouter } from "next/router";
 import { useCompanyById } from "@c/Company/db";
 import Head from "next/head";
@@ -12,6 +12,9 @@ import CompanySection from "@c/Company/CompanySection";
 import CompanyLayoffHistoryLineChart from "@c/Chart/CompanyLayoffHistoryLineChart";
 import Card from "@c/Card/Card";
 import CsuitSection from "@c/Csuit/CsuitSection";
+import SubCard from "@c/Subsidiaries/SubCard";
+import ReportedPipCard from "@c/Pip/ReportedPipCard";
+import FreezeCard from "@c/Freeze/FreezeCard";
 
 const CompanyPg: NextPage = () => {
   const router = useRouter();
@@ -40,6 +43,25 @@ const CompanyPg: NextPage = () => {
         <Skeleton height="200px" />
       ) : (
         <ExecCard company_csuit={company.company_csuit} />
+      )}
+      <div style={{ height: 15, width: 1 }} />
+      {isLoading ? (
+        <Skeleton height="200px" />
+      ) : (
+        <ReportedPipCard company_id={company.id} />
+      )}
+
+      <div style={{ height: 15, width: 1 }} />
+      {isLoading ? (
+        <Skeleton height="200px" />
+      ) : (
+        <FreezeCard company_id={company.id} />
+      )}
+      <div style={{ height: 15, width: 1 }} />
+      {isLoading ? (
+        <Skeleton height="100px" />
+      ) : (
+        <SubCard company_id={company.id} />
       )}
       <div style={{ height: 15, width: 1 }} />
       {!isLoading && <MoreInfoButton id={id as string} type="layoff" />}
@@ -80,7 +102,7 @@ const ExecCard = ({ company_csuit }: { company_csuit?: any[] }) => {
 
   if (res === null) {
     return (
-      <Card title="Company Execs">
+      <Card isSmall title="Company Execs" startIcon={<IconId />}>
         <Text>No info about execs found</Text>
       </Card>
     );

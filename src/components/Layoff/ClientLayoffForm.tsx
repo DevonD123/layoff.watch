@@ -1,10 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Button, Grid, TextInput, Textarea, Checkbox } from "@mantine/core";
+import {
+  Button,
+  Grid,
+  TextInput,
+  Textarea,
+  Checkbox,
+  Chip,
+} from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import CompanySelect from "@c/Company/CompanySelect";
 import PositionSelect from "@c/Position/PositionSelect";
 import CsuitSelect from "@c/Csuit/CSuitSelect";
-import { IReportData } from "./types";
+import { IReportData, ReportType, ReportTypeCompleted } from "./types";
 import { addLayoffAsDraft } from "./db";
 import { User } from "@supabase/supabase-js";
 
@@ -27,6 +34,7 @@ const defaultState: IReportData = {
   csuit_ids: [],
   position_ids: [],
   add_to_job_board: false,
+  type: ReportType.Layoff,
 };
 
 export default function ClientLayoffForm({ onClose, open, user }: Props) {
@@ -130,6 +138,23 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
   return (
     <Grid style={{ height: "100%", overflowY: "auto", paddingBottom: "2em" }}>
       <Grid.Col span={12}>
+        <Chip.Group
+          position="center"
+          value={data.type.toString()}
+          onChange={(val) =>
+            setData({ ...data, type: parseInt((val || "1") as string) })
+          }
+        >
+          <Chip value={ReportType.Layoff.toString()}>Layoff</Chip>
+          <Chip value={ReportType.Pip.toString()}>PIP</Chip>
+          <Chip value={ReportTypeCompleted.Pip.toString()}>PIP Cancelled</Chip>
+          <Chip value={ReportType.Freeze.toString()}>Hiring Freeze</Chip>
+          <Chip value={ReportTypeCompleted.Freeze.toString()}>
+            Hiring Freeze Cancelled
+          </Chip>
+        </Chip.Group>
+      </Grid.Col>
+      <Grid.Col span={12}>
         <TextInput
           required
           placeholder="title"
@@ -142,39 +167,52 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
           ref={titleRef}
         />
       </Grid.Col>
-      <Grid.Col span={8}>
-        <TextInput
-          type="number"
-          placeholder="1,235"
-          name="number"
-          label="Estimated layoff count"
-          value={data.number}
-          onKeyPress={stopNonNumbers}
-          onChange={handleChange}
-          onFocus={handleFocus}
-          ref={numberRef}
-        />
-      </Grid.Col>
-      <Grid.Col span={4}>
-        <TextInput
-          type="number"
-          placeholder="50"
-          name="percent"
-          label="%"
-          onKeyPress={stopNonNumbers}
-          value={data.percent}
-          onChange={handleChange}
-          onFocus={handleFocus}
-          ref={percentRef}
-          error={
-            isNaN(data.percent)
-              ? "Invalid input"
-              : data.percent > 99 || data.percent < 0
-              ? "Must be 0-99%"
-              : ""
-          }
-        />
-      </Grid.Col>
+      {data.type === ReportType.Layoff && (
+        <Grid.Col span={8}>
+          <TextInput
+            type="number"
+            placeholder="1,235"
+            name="number"
+            label="Estimated layoff count"
+            value={data.number}
+            onKeyPress={stopNonNumbers}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            ref={numberRef}
+          />
+        </Grid.Col>
+      )}
+      {![
+        ReportType.Freeze,
+        ReportTypeCompleted.Freeze,
+        ReportTypeCompleted.Pip,
+      ].includes(data.type) && (
+        <Grid.Col span={data.type === ReportType.Layoff ? 4 : 12}>
+          <TextInput
+            type="number"
+            placeholder="50"
+            name="percent"
+            label={
+              data.type === ReportType.Layoff
+                ? "est. %"
+                : "Targeted % of employees"
+            }
+            required={data.type === ReportType.Pip}
+            onKeyPress={stopNonNumbers}
+            value={data.percent}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            ref={percentRef}
+            error={
+              isNaN(data.percent)
+                ? "Invalid input"
+                : data.percent > 99 || data.percent < 0
+                ? "Must be 0-99%"
+                : ""
+            }
+          />
+        </Grid.Col>
+      )}
       <Grid.Col span={8}>
         <TextInput
           type="text"
@@ -264,18 +302,28 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
           onKeyDown={handleEnterClicked}
           label="Expected Date"
           placeholder={"August 25, 2022"}
+          required
         />
       </Grid.Col>
-      <Grid.Col span={12}>
-        <Checkbox
-          onChange={handleCheck}
-          checked={addToList}
-          label="Add me to the available for work list (you will only be contacted through an email from us)"
-        />
-      </Grid.Col>
+      {false && (
+        <Grid.Col span={12}>
+          <Checkbox
+            onChange={handleCheck}
+            checked={addToList}
+            label="Add me to the available for work list (you will only be contacted through an email from us)"
+          />
+        </Grid.Col>
+      )}
       <Grid.Col span={12} style={{ textAlign: "right" }}>
         <Button
-          disabled={!company || !company[0] || !data.title || !data.sub_email}
+          disabled={
+            !company ||
+            !company[0] ||
+            !data.title ||
+            !data.sub_email ||
+            !data.layoff_date ||
+            (data.type === ReportType.Pip && !data.percent)
+          }
           onClick={handleSubmit}
         >
           Submit

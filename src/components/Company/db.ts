@@ -103,3 +103,14 @@ export function useCompanyById(id: String) {
     { enabled: !!id }
   );
 }
+
+export function useTopPipAndFreeze(id: String) {
+  return useQuery(
+    ["useTopPipAndFreeze", { id }],
+    () =>
+      supabase
+        .rpc("company_pip_freeze_last", { c_id: id })
+        .then(handleVisibleGenericErr),
+    { enabled: !!id }
+  );
+}

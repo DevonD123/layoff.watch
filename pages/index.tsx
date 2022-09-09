@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import type { NextPage } from "next";
 import MainLayout from "@c/Layout";
-import { Text, Skeleton } from "@mantine/core";
+import { Anchor, Skeleton } from "@mantine/core";
+import Card from "@c/Card/Card";
 import dynamic from "next/dynamic";
+import Feed from "@c/Layoff/Feed";
 
 const Chart = dynamic(() => import("@c/Chart/LayoffLineChart"), {
   ssr: false,
@@ -10,18 +12,20 @@ const Chart = dynamic(() => import("@c/Chart/LayoffLineChart"), {
 }) as any;
 
 const Home: NextPage = () => {
+  const [open, setOpen] = useState(false);
   return (
     <MainLayout>
-      <Text size={"md"} component="h1" align="center">
-        Layoffs to date
-      </Text>
-      <Text size="xs" color="dimmed" component="h2" align="center">
-        See which companies and executives have a history of laying off
-        employees
-      </Text>
-      <div style={{ height: "50vh", width: "100%", margin: "0 auto" }}>
-        <Chart />
-      </div>
+      <Card isSmall isDark title="Layoffs to date">
+        <Anchor onClick={() => setOpen(!open)}>
+          {open ? "Minimize chart" : "See Chart"}
+        </Anchor>
+        {open && (
+          <div style={{ width: "100%", height: 300 }}>
+            <Chart />
+          </div>
+        )}
+      </Card>
+      <Feed />
     </MainLayout>
   );
 };

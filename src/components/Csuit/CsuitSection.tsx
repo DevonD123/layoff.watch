@@ -27,7 +27,6 @@ function CsuitSection({
   img_url,
   name,
   role,
-  bio,
   start,
   end,
   hasLink = true,
@@ -74,13 +73,6 @@ function CsuitSection({
           </Text>
         )}
       </Grid.Col>
-      {bio && (
-        <Grid.Col span={12}>
-          <Text size="md" align="center">
-            {bio}
-          </Text>
-        </Grid.Col>
-      )}
     </Grid>
   );
 }

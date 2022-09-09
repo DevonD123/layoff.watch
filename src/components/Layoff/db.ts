@@ -1,12 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import {
-  handleVisibleGenericErr,
-  handleVisibleGenericErrWithCount,
-} from "@h/db/helper";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { handleVisibleGenericErr } from "@h/db/helper";
 import showMsg from "@h/msg";
 import { supabase } from "@h/supabaseClient";
-import { getRangeValues } from "@h/pghelper";
-import { IReportData } from "./types";
+import { IReportData, ReportType, ReportTypeCompleted } from "./types";
 import { supabaseClient } from "@supabase/auth-helpers-nextjs";
 
 export async function addLayoffAsDraft({
@@ -22,11 +18,17 @@ export async function addLayoffAsDraft({
   add_to_job_board,
   csuit_ids,
   position_ids,
+  type = ReportType.Layoff,
 }: IReportData) {
   let errCount = 0;
   if (!title) {
     console.error("No title provided");
     showMsg("Please add a title", "error");
+    errCount += 1;
+  }
+  if (!layoff_date) {
+    console.error("No layoof_date provided");
+    showMsg("Please add an expected date", "error");
     errCount += 1;
   }
   if (!company_id) {
@@ -36,6 +38,16 @@ export async function addLayoffAsDraft({
   }
   if (errCount >= 1) {
     return null;
+  }
+  let reportType = type;
+  let is_completed = false;
+  if (reportType === ReportTypeCompleted.Freeze) {
+    reportType = ReportType.Freeze;
+    is_completed = true;
+  }
+  if (reportType === ReportTypeCompleted.Pip) {
+    reportType = ReportType.Pip;
+    is_completed = true;
   }
   const { data, error } = await supabase.from("layoff").insert({
     title,
@@ -48,13 +60,15 @@ export async function addLayoffAsDraft({
     sub_email,
     extra_info,
     add_to_job_board,
+    is_completed,
+    type: reportType,
     is_draft: true,
   });
 
   if (error || !data || data.length <= 0) {
     console.error("Layoff err");
     console.error(error);
-    showMsg("Error adding layoff report", "error");
+    showMsg("Error adding report", "error");
     return null;
   }
 
@@ -111,7 +125,7 @@ export async function addLayoffAsDraft({
   return data[0];
 }
 
-export function useLayoutPgData(id: string) {
+export function useLayoffPgData(id: string) {
   return useQuery(
     ["layout", { id }],
     () =>

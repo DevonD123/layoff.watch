@@ -163,7 +163,7 @@ const MainLayout = ({ children }: IProps) => {
         position="bottom"
         opened={openReportLayoff}
         onClose={closeReportLayoff}
-        title={"Report a layoff"}
+        title={"Report a:"}
         padding="md"
         size="xl"
       >
