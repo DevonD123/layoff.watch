@@ -26,11 +26,18 @@ import ClientLayoffForm from "@c/Layoff/ClientLayoffForm";
 import { useUser } from "@supabase/auth-helpers-react";
 import { User } from "@supabase/supabase-js";
 import RecentBar from "@c/Recent";
+import QSP from "@h/qsp";
 
 interface IProps extends PropsWithChildren<{}> {}
 
 const mobileBreakPoint = "sm";
-const Pages = ({ currentPath, user }: { currentPath: string; user?: User }) => {
+const Pages = ({
+  currentPath,
+  user,
+}: {
+  currentPath: string;
+  user: User | null;
+}) => {
   return (
     <Group position="apart">
       <Link href="/" passHref>
@@ -145,14 +152,23 @@ const MainLayout = ({ children }: IProps) => {
                 {/* <RecentBar /> TODO share subscription */}
               </div>
             )}
-            <Button
-              color="pink"
-              ml="auto"
-              mr="0"
-              onClick={() => setopenReportLayoff(true)}
-            >
-              Report a Layoff
-            </Button>
+            {user && (
+              <Button
+                color="pink"
+                ml="auto"
+                mr="0"
+                onClick={() => setopenReportLayoff(true)}
+              >
+                Report info
+              </Button>
+            )}
+            {!user && (
+              <Link href={`/auth?${QSP.page}=sign-up`}>
+                <Button color="blue" ml="auto" mr="0">
+                  Login/Sign up
+                </Button>
+              </Link>
+            )}
           </div>
           <RecentBar />
         </Header>
@@ -167,11 +183,28 @@ const MainLayout = ({ children }: IProps) => {
         padding="md"
         size="xl"
       >
-        <ClientLayoffForm
-          user={user}
-          open={openReportLayoff}
-          onClose={closeReportLayoff}
-        />
+        {!user && (
+          <>
+            <Link href={`/auth?${QSP.page}=sign-up`}>
+              <Button color="blue" mx="auto" size="xl">
+                Please create a free account before posting
+              </Button>
+            </Link>
+            <br />
+            <Link href={`/auth?${QSP.page}=login`}>
+              <Button color="green" mx="auto" size="xl">
+                Have an account? Login
+              </Button>
+            </Link>
+          </>
+        )}
+        {user && (
+          <ClientLayoffForm
+            user={user}
+            open={openReportLayoff}
+            onClose={closeReportLayoff}
+          />
+        )}
       </Drawer>
     </AppShell>
   );

@@ -10,7 +10,6 @@ import {
 import { DatePicker } from "@mantine/dates";
 import CompanySelect from "@c/Company/CompanySelect";
 import PositionSelect from "@c/Position/PositionSelect";
-import CsuitSelect from "@c/Csuit/CSuitSelect";
 import { IReportData, ReportType, ReportTypeCompleted } from "./types";
 import { addLayoffAsDraft } from "./db";
 import { User } from "@supabase/supabase-js";
@@ -18,7 +17,7 @@ import { User } from "@supabase/supabase-js";
 type Props = {
   open: boolean;
   onClose: () => void;
-  user?: User;
+  user: User | null;
 };
 
 const defaultState: IReportData = {
@@ -42,7 +41,6 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
   const [addToList, setAddToList] = useState(true);
   const [company, setCompany] = useState<any[]>([]);
   const [positions, setPositions] = useState<any[]>([]);
-  const [csuit, setCSuit] = useState<any[]>([]);
 
   const titleRef = useRef<HTMLInputElement>(null),
     source_displayRef = useRef<HTMLInputElement>(null),
@@ -58,9 +56,6 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
       reportData.company_id = company[0].id;
     }
 
-    if (csuit && csuit.length >= 1) {
-      reportData.csuit_ids = csuit.map((x) => x.csuit.id);
-    }
     if (positions && positions.length >= 1) {
       reportData.position_ids = positions.map((x) => x.id);
     }
@@ -155,6 +150,26 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
         </Chip.Group>
       </Grid.Col>
       <Grid.Col span={12}>
+        <CompanySelect
+          required
+          canCreate
+          isSingleSelect
+          dropdownPosition="top"
+          values={company}
+          onChange={setCompany}
+        />
+      </Grid.Col>
+      <Grid.Col span={12}>
+        <DatePicker
+          value={data.layoff_date}
+          onChange={handleChangeDate}
+          onKeyDown={handleEnterClicked}
+          label="Expected Date"
+          placeholder={"August 25, 2022"}
+          required
+        />
+      </Grid.Col>
+      <Grid.Col span={12}>
         <TextInput
           required
           placeholder="title"
@@ -239,7 +254,7 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
           ref={source_displayRef}
         />
       </Grid.Col>
-      <Grid.Col span={12}>
+      {/* <Grid.Col span={12}>
         <TextInput
           required
           type="email"
@@ -254,18 +269,8 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
           ref={sub_emailRef}
           disabled={!!user}
         />
-      </Grid.Col>
-      <Grid.Col span={12}>
-        <CompanySelect
-          required
-          canCreate
-          isSingleSelect
-          dropdownPosition="top"
-          values={company}
-          onChange={setCompany}
-        />
-      </Grid.Col>
-      <Grid.Col span={12}>
+      </Grid.Col> */}
+      {/* <Grid.Col span={12}>
         <CsuitSelect
           label="Execs"
           placeholder="Search execs"
@@ -275,7 +280,7 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
           values={csuit}
           onChange={setCSuit}
         />
-      </Grid.Col>
+      </Grid.Col> */}
       <Grid.Col span={12}>
         <PositionSelect
           dropdownPosition="top"
@@ -295,16 +300,6 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
           ref={extra_infoRef}
         />
       </Grid.Col>
-      <Grid.Col span={12}>
-        <DatePicker
-          value={data.layoff_date}
-          onChange={handleChangeDate}
-          onKeyDown={handleEnterClicked}
-          label="Expected Date"
-          placeholder={"August 25, 2022"}
-          required
-        />
-      </Grid.Col>
       {false && (
         <Grid.Col span={12}>
           <Checkbox
@@ -320,7 +315,7 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
             !company ||
             !company[0] ||
             !data.title ||
-            !data.sub_email ||
+            // !data.sub_email ||
             !data.layoff_date ||
             (data.type === ReportType.Pip && !data.percent)
           }

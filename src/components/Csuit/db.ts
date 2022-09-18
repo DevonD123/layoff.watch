@@ -217,3 +217,33 @@ export async function addCSuitAsDraft({
 
   return { ...link[0], csuit: data[0] };
 }
+
+export function useCsuitById(csuit_id?: string) {
+  return useQuery(
+    ["useCsuitById", { csuit_id }],
+    () =>
+      supabase
+        .from("csuit")
+        .select(`*, csuit_role(*,company(*))`)
+        .eq("id", csuit_id)
+        .eq("deleted", false)
+        .single()
+        .then(handleVisibleGenericErr),
+    { enabled: !!csuit_id }
+  );
+}
+
+export function useAllCSuitSummary() {
+  return useQuery(
+    ["useAllCSuitSummary"],
+    () =>
+      supabase
+        .from("csuit")
+        .select(
+          `id,name,img_url, csuit_role(id,role,end,company(id,name,ticker))`
+        )
+        .eq("deleted", false)
+        .then(handleVisibleGenericErr),
+    {}
+  );
+}

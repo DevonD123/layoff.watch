@@ -1,4 +1,4 @@
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { handleVisibleGenericErr } from "@h/db/helper";
 import showMsg from "@h/msg";
 import { supabase } from "@h/supabaseClient";
@@ -13,10 +13,10 @@ export async function addLayoffAsDraft({
   percent,
   layoff_date,
   company_id,
-  sub_email,
+  // sub_email,
   extra_info,
   add_to_job_board,
-  csuit_ids,
+  // csuit_ids,
   position_ids,
   type = ReportType.Layoff,
 }: IReportData) {
@@ -57,7 +57,7 @@ export async function addLayoffAsDraft({
     percent,
     layoff_date,
     company_id,
-    sub_email,
+    // sub_email,
     extra_info,
     add_to_job_board,
     is_completed,
@@ -72,27 +72,27 @@ export async function addLayoffAsDraft({
     return null;
   }
 
-  if (csuit_ids && csuit_ids.length >= 1 && data[0].id) {
-    const arr = [];
-    for (let i = 0; i < csuit_ids.length; i++) {
-      arr.push({
-        layoff_id: data[0].id,
-        csuit_id: csuit_ids[i],
-        is_draft: true,
-      });
-    }
+  // if (csuit_ids && csuit_ids.length >= 1 && data[0].id) {
+  //   const arr = [];
+  //   for (let i = 0; i < csuit_ids.length; i++) {
+  //     arr.push({
+  //       layoff_id: data[0].id,
+  //       csuit_id: csuit_ids[i],
+  //       is_draft: true,
+  //     });
+  //   }
 
-    const { data: csuit, error: csuitErr } = await supabase
-      .from("csuit_layoff")
-      .insert(arr);
+  //   const { data: csuit, error: csuitErr } = await supabase
+  //     .from("csuit_layoff")
+  //     .insert(arr);
 
-    if (csuitErr || !csuit || csuit.length <= 0) {
-      console.error("Csuit err");
-      console.error(csuitErr);
-      showMsg("Error adding execs to the report", "error");
-      return null;
-    }
-  }
+  //   if (csuitErr || !csuit || csuit.length <= 0) {
+  //     console.error("Csuit err");
+  //     console.error(csuitErr);
+  //     showMsg("Error adding execs to the report", "error");
+  //     return null;
+  //   }
+  // }
 
   if (position_ids && position_ids.length >= 1 && data[0].id) {
     const arr = [];
@@ -142,5 +142,19 @@ export function useLayoffPgData(id: string) {
         .single()
         .then(handleVisibleGenericErr),
     { enabled: !!id }
+  );
+}
+
+export function useLayoffsBetween(start: Date, companies: string[]) {
+  return useQuery(
+    ["useLayoffsBetween", { companies }],
+    () =>
+      supabaseClient
+        .from("layoff")
+        .select(`*,company(name)`)
+        .in("company_id", companies)
+        .gte("layoff_date", start)
+        .then(handleVisibleGenericErr),
+    { enabled: !!companies && companies.length >= 1 }
   );
 }

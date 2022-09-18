@@ -21,6 +21,7 @@ export interface IProps {
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   dropdownPosition?: "bottom" | "top" | "flip";
   required?: boolean;
+  ref?: any;
 }
 export interface IOption {
   label: string;
@@ -47,10 +48,12 @@ function Select({
   dropdownPosition = "bottom",
   required,
   size,
+  ref,
 }: IProps) {
   const canCreate = typeof createClicked === "function";
   return (
     <MSelect
+      ref={ref}
       required={required}
       dropdownPosition={dropdownPosition}
       size={size}

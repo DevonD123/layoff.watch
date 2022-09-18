@@ -43,10 +43,9 @@ const Home: NextPage = () => {
   const { classes } = useStyles();
   const { data, isLoading } = useMinimalCompanyList();
   const [text, setText] = useState("");
+  const [input, setInput] = useState("");
   const [hasPast, setHasPast] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
-  console.log(data);
-  //   const { data, isLoading } = useLayoutPgData(id as string);
   return (
     <MainLayout>
       <Head>
@@ -69,8 +68,14 @@ const Home: NextPage = () => {
       </div>
       <TextInput
         placeholder="microsoft"
-        value={text}
-        onChange={(e) => setText(e.target.value.toLowerCase())}
+        value={input}
+        onChange={(e) => setInput(e.target.value.toLowerCase())}
+        onBlur={() => setText(input)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            setText(input);
+          }
+        }}
         style={{ marginBottom: "1em" }}
       />
 

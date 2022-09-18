@@ -1,15 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useCompanies, addCompanyAsDraft } from "./db";
-import CreateEntityDialog from "@c/Dialog/CreateEntityDialog";
-import TextInput from "@c/Editor/TextInput";
-import Image from "next/image";
+import { Avatar } from "@mantine/core";
 import showMsg from "@h/msg";
-import { ICompanyOption } from "./types";
-import { getCommaSeperatedText } from "./helper";
-import Select, { IOption, ISelectedRendererProps } from "@c/Input/Select";
-import { Avatar, Grid, Text } from "@mantine/core";
 import RootTag from "@c/Tag/RootTag";
+import Select, { IOption, ISelectedRendererProps } from "@c/Input/Select";
+import { ICompanyOption } from "./types";
 import CompanyAddEditDialog from "./CompanyAddEditDialog";
+import { useCompanies, addCompanyAsDraft } from "./db";
 
 type Props = {
   canCreate?: boolean;

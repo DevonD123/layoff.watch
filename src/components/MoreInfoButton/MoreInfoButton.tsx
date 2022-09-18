@@ -41,7 +41,7 @@ export default function MoreInfoButton({ type, id }: Props) {
   }
   return (
     <div style={{ margin: "5px auto", width: "100%", maxWidth: 300 }}>
-      <Button color="cyan" fullWidth onClick={() => setOpen(true)}>
+      <Button fullWidth onClick={() => setOpen(true)}>
         Submit some more info
       </Button>
       <Drawer

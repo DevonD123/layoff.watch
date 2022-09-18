@@ -11,6 +11,7 @@ import {
   Text,
   Anchor,
   LoadingOverlay,
+  PasswordInput,
 } from "@mantine/core";
 import { IconBrandGoogle, IconBrandFacebook } from "@tabler/icons";
 import Link from "next/link";
@@ -230,7 +231,7 @@ const AuthPg = () => {
           />
         )}
         {pgData.hasPassword && (
-          <TextInput
+          <PasswordInput
             type="password"
             value={data.password}
             onChange={(e) => setData({ ...data, password: e.target.value })}
@@ -240,7 +241,7 @@ const AuthPg = () => {
           />
         )}
         {pgData.hasPassConfirm && (
-          <TextInput
+          <PasswordInput
             type="password"
             value={data.password2}
             onChange={(e) => setData({ ...data, password2: e.target.value })}

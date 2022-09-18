@@ -97,7 +97,7 @@ const fetchFeed = async ({ pageParam = 1 }): Promise<IPageData> => {
   return { items: data, total: count || 0 };
 };
 
-const IconMap = {
+export const IconMap = {
   [ReportType.Layoff]: {
     color: "red",
     icon: IconFlame,

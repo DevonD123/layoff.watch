@@ -4,6 +4,7 @@ import useRequiredUser from "@h/useRequiredUser";
 import { supabaseClient } from "@supabase/auth-helpers-nextjs";
 import { Anchor } from "@mantine/core";
 import { IconLogout } from "@tabler/icons";
+import Link from "next/link";
 
 type Props = {};
 
@@ -19,8 +20,15 @@ const Account = ({}: Props) => {
       <br />
       <br />
       {!isLoading && (
+        <Link href="/account/changepass" passHref>
+          <Anchor>Change Password</Anchor>
+        </Link>
+      )}
+      <br />
+      <br />
+      {!isLoading && (
         <Anchor onClick={logout}>
-          <IconLogout /> Logout
+          <IconLogout size={18} /> Logout
         </Anchor>
       )}
     </MainLayout>
