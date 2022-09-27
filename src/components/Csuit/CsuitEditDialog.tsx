@@ -2,6 +2,7 @@ import React from "react";
 import { Avatar, Grid, Select, Text, Textarea, TextInput } from "@mantine/core";
 import CreateEntityDialog from "@c/Dialog/CreateEntityDialog";
 import Image from "next/image";
+import getImage from "@h/getImage";
 
 type Props = {
   isOpen: boolean;
@@ -36,7 +37,11 @@ function CsuitEditDialog({
             <Avatar style={{ width: 20, height: 20 }}>
               {data.logo_url ? (
                 <Image
-                  src={`${data.logo_url}?size=50&format=png`}
+                  src={getImage({
+                    url: data.uploaded_logo_key,
+                    fallbackUrl: data?.logo_url,
+                    size: 20,
+                  })}
                   width={20}
                   height={20}
                   alt={"company logo"}

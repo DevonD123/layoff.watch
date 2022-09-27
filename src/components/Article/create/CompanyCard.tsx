@@ -2,6 +2,7 @@ import { PropsWithChildren } from "react";
 import { Avatar, CloseButton, Box, ActionIcon } from "@mantine/core";
 import { IconLink } from "@tabler/icons";
 import Link from "next/link";
+import getImage from "@h/getImage";
 
 interface IProps extends PropsWithChildren<{}> {
   name: string;
@@ -12,6 +13,7 @@ interface IProps extends PropsWithChildren<{}> {
   isAdmin?: string;
   onRemove?: () => void;
   linkTo?: string;
+  uploaded_logo_key?: string;
 }
 
 function CompanyCard({
@@ -22,6 +24,7 @@ function CompanyCard({
   ticker,
   logo_url,
   linkTo,
+  uploaded_logo_key,
 }: IProps) {
   return (
     <Box
@@ -54,7 +57,11 @@ function CompanyCard({
         >
           <Avatar
             style={{ marginRight: 10 }}
-            src={logo_url && `${logo_url}?size=${30}&format=png`}
+            src={getImage({
+              url: uploaded_logo_key,
+              fallbackUrl: logo_url,
+              size: 30,
+            })}
             alt={name}
             size={30}
           >

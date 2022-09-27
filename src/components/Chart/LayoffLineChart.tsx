@@ -20,7 +20,7 @@ interface IData {
   layoffs: number;
   lastYear: number;
 }
-const LayoffLineChart = () => {
+const LayoffLineChart = ({ showYTicks = true }: { showYTicks?: boolean }) => {
   const theme = useMantineTheme();
   const { isLoading, error, data } = useLayoffMSummary();
   if (error) {
@@ -85,7 +85,17 @@ const LayoffLineChart = () => {
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
-        <YAxis />
+        {showYTicks && (
+          <YAxis
+            tick={{ fontSize: 10 }}
+            tickFormatter={(value) =>
+              new Intl.NumberFormat("en", {
+                notation: "compact",
+                compactDisplay: "short",
+              }).format(value)
+            }
+          />
+        )}
         <Tooltip />
         <Legend />
         <Line

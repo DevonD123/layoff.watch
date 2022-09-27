@@ -9,12 +9,13 @@ import {
 } from "@mantine/core";
 import { IconCaretRight } from "@tabler/icons";
 import Link from "next/link";
+import getImage from "@h/getImage";
 
 type Props = {
   filter?: string;
   id: string;
   name: String;
-  image_url?: string;
+  img_url?: string;
   csuit_role?: {
     id: string;
     role: string;
@@ -30,7 +31,7 @@ type Props = {
 
 function CsuitSummaryListItem({
   id,
-  image_url,
+  img_url,
   name,
   csuit_role,
   filter,
@@ -76,7 +77,11 @@ function CsuitSummaryListItem({
     >
       <td style={{ flexGrow: 1, width: "50%" }}>
         <Group spacing="sm">
-          <Avatar size={40} src={image_url} radius={40} />
+          <Avatar
+            size={40}
+            src={img_url ? getImage({ fallbackUrl: img_url }) : ""}
+            radius={40}
+          />
           <div>
             <Text size="sm" weight={500}>
               {name}

@@ -44,6 +44,7 @@ import HtmlContent from "./HtmlContent";
 import StandAloneTag from "@c/Tag/StandAloneTag";
 import { useRouter } from "next/router";
 import getControls from "@c/Editor/getControls";
+import getImage from "@h/getImage";
 
 const metaDescHelper = (desc: string) => {
   if (!desc) {
@@ -178,10 +179,11 @@ function CreateArticle({ isAdmin, isDraft, isOwner }: Props) {
                       <Avatar
                         style={{ marginRight: 5 }}
                         size={20}
-                        src={
-                          companyInfo[x].logo_url &&
-                          `${companyInfo[x].logo_url}?size=${20}&format=png`
-                        }
+                        src={getImage({
+                          url: companyInfo[x].uploaded_logo_key,
+                          fallbackUrl: companyInfo[x].logo_url,
+                          size: 20,
+                        })}
                         alt={companyInfo[x].name}
                       >
                         {companyInfo[x].name.charAt(0)}

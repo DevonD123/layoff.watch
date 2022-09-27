@@ -13,6 +13,7 @@ import { IconChartBar, IconLink, IconSnowflake } from "@tabler/icons";
 import Card from "@c/Card/Card";
 import { useTopPipAndFreeze } from "./db";
 import { ReportType } from "@c/Layoff/types";
+import VerifiedBadge from "@c/Verified/VerifiedBadge";
 
 interface Props extends PropsWithChildren<{}> {
   id: string;
@@ -22,6 +23,7 @@ interface Props extends PropsWithChildren<{}> {
   description?: string;
   est_employee_count?: number;
   hasLink?: boolean;
+  verified?: boolean;
 }
 
 export default function CompanySection({
@@ -32,6 +34,7 @@ export default function CompanySection({
   description,
   est_employee_count,
   hasLink = true,
+  verified,
   children,
 }: Props) {
   const { data, isLoading } = useTopPipAndFreeze(id);
@@ -62,6 +65,7 @@ export default function CompanySection({
       ) : (
         <Avatar style={{ height: 150, width: 150 }} src={logo_url} alt={name} />
       )}
+      <VerifiedBadge verified={verified} />
       <Bubble>
         <Text color="black" size="xl">
           {name}{" "}

@@ -5,8 +5,10 @@ import {
 } from "@h/db/helper";
 import showMsg from "@h/msg";
 import { supabase } from "@h/supabaseClient";
+import { v4 as uuidv4 } from "uuid";
 import { getRangeValues } from "@h/pghelper";
 import { ICSuitInput } from "./types";
+import uploadFile from "@h/uploadFile";
 
 export function useCSuitByCompanies(company_ids: string[]) {
   return useQuery(
@@ -138,27 +140,21 @@ async function getSizedImage(file: File) {
   return blob;
 }
 
-export const getImgUrl = (key: string) => {
-  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${key}`;
-};
-
 export async function addCSuitAsDraft({
   name,
   bio,
-  img_url,
-  linked_in_url,
-  role,
   company_id,
   start,
   end,
+  role,
   file,
 }: ICSuitInput & { file?: File }) {
+  const key = await uploadFile("csuit-avatar", file);
+
   const { data, error } = await supabase.from("csuit").insert({
     name,
     bio,
-    img_url,
-    linked_in_url,
-    role,
+    img_url: key,
     is_draft: true,
   });
 
@@ -169,12 +165,13 @@ export async function addCSuitAsDraft({
   }
 
   let { data: link, error: linkErr } = await supabase
-    .from("company_csuit")
+    .from("csuit_role")
     .insert({
       company_id,
       csuit_id: data[0].id,
       start,
       end,
+      role,
       is_draft: true,
     });
 
@@ -182,37 +179,6 @@ export async function addCSuitAsDraft({
     console.error(linkErr);
     showMsg("Error adding exec", "error");
     return null;
-  }
-
-  if (file) {
-    const blob = await getSizedImage(file);
-    const { data: upload, error: uploadErr } = await supabase.storage
-      .from("csuit-avatar")
-      .upload(`public/${data[0].id}_avatar.png`, blob, {
-        cacheControl: "3600",
-        upsert: false,
-      });
-    if (uploadErr || !upload) {
-      console.error("Error uploading");
-      console.error(uploadErr, upload);
-      showMsg("Error uploading file", "error");
-      return null;
-    }
-
-    const { data: updated, error: updateErr } = await supabase
-      .from("csuit")
-      .update({
-        img_url: upload.Key,
-      })
-      .match({ id: data[0].id });
-
-    if (!updated || updateErr || updated.length <= 0) {
-      console.error("Error uploading");
-      console.error(uploadErr, upload);
-      showMsg("Error uploading file", "warning");
-    } else {
-      data[0].img_url = updated[0].img_url;
-    }
   }
 
   return { ...link[0], csuit: data[0] };

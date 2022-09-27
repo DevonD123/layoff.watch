@@ -18,6 +18,7 @@ import Link from "next/link";
 import QSP from "@h/qsp";
 import { Provider } from "@supabase/supabase-js";
 import showMsg from "@h/msg";
+
 const DEFAULT_DATA = {
   email: "",
   password: "",
@@ -202,7 +203,7 @@ const AuthPg = () => {
   }
   const pgData = getPgData();
   return (
-    <Container>
+    <Container style={{ paddingTop: "10vh" }}>
       <Text align="center" size="xl" sx={{ marginTop: 10, marginBottom: 10 }}>
         {pgData.title}
       </Text>
@@ -211,9 +212,10 @@ const AuthPg = () => {
         p="lg"
         radius="md"
         withBorder
-        sx={(theme) => ({
-          //   backgroundColor: theme.colors.white[3],
-        })}
+        style={{
+          maxWidth: 300,
+          margin: "10px auto",
+        }}
       >
         {error && (
           <Text color="red" align="center" size="md">
@@ -333,6 +335,11 @@ const AuthPg = () => {
           </>
         )}
       </Card>
+      <div style={{ textAlign: "center", width: "100%" }}>
+        <Link href="/" passHref>
+          <Anchor>Back to the Home page</Anchor>
+        </Link>
+      </div>
       <LoadingOverlay visible={isLoading} overlayBlur={1} />
     </Container>
   );

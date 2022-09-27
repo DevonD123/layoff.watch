@@ -6,7 +6,8 @@ create or replace function recent_company_layoffs ()
       amount INTEGER,
       layoff_date DATE,
       name TEXT,
-      logo_url TEXT
+      logo_url TEXT,
+      uploaded_logo_key TEXT
     ) 
 language plpgsql
 as $$
@@ -19,7 +20,8 @@ begin
                l.number:: INTEGER as amount,
                l.layoff_date,
                c.name,
-               c.logo_url
+               c.logo_url,
+               c.uploaded_logo_key
             from public.layoff l
             join company c on c.id = l.company_id 
             where 

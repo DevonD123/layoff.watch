@@ -16,6 +16,7 @@ import MoreInfoButton from "@c/MoreInfoButton/MoreInfoButton";
 import CompanyLayoffHistoryLineChart from "@c/Chart/CompanyLayoffHistoryLineChart";
 import { ReportType } from "@c/Layoff/types";
 import getCompltedStatusIcon from "@h/getCompletedStatusIcon";
+import VerifiedBadge from "@c/Verified/VerifiedBadge";
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -29,7 +30,14 @@ const Home: NextPage = () => {
           reported
         </title>
       </Head>
-      {isLoading ? <Skeleton /> : <Title order={2}>{data.title}</Title>}
+      {isLoading ? (
+        <Skeleton />
+      ) : (
+        <>
+          <VerifiedBadge {...data} />
+          <Title order={2}>{data.title}</Title>
+        </>
+      )}
       {isLoading ? (
         <Skeleton />
       ) : (

@@ -4,7 +4,7 @@ import TextInput from "@c/Editor/TextInput";
 import CreateEntityDialog from "@c/Dialog/CreateEntityDialog";
 import { getCommaSeperatedText } from "./helper";
 import Image from "next/image";
-import showMsg from "@h/msg";
+import DropZone from "@c/DropZone/DropZone";
 
 type Props = {
   isOpen: boolean;
@@ -32,6 +32,7 @@ function CompanyAddEditDialog({
       onAccept={onAccept}
       onClose={onClose}
       open={isOpen}
+      acceptDisabled={!data.name}
       title={
         isCreateMode ? (
           "Add a company to our database"
@@ -89,7 +90,7 @@ function CompanyAddEditDialog({
             placeholder="MSFT"
           />
         </Grid.Col>
-        <Grid.Col xs={6}>
+        <Grid.Col xs={12}>
           <TextInput
             id="newEstEmployeeCount"
             name="newEstEmployeeCount"
@@ -104,8 +105,32 @@ function CompanyAddEditDialog({
             placeholder="221,000"
           />
         </Grid.Col>
+
+        <Grid.Col xs={12}>
+          <Textarea
+            id="newDescription"
+            name="newDescription"
+            value={data.description || ""}
+            onChange={(e) => onChange(e.target.value, "description")}
+            label="Description"
+            placeholder="Global diversified tech company."
+            minRows={3}
+            autosize
+          />
+        </Grid.Col>
+
+        <Grid.Col xs={12}>
+          <Text align="center" size="lg">
+            Logo
+          </Text>
+          <Text align="center" size="sm" color="dimmed">
+            Add the logo from the companies website buy entering their domain or
+            upload an image
+          </Text>
+          <hr />
+        </Grid.Col>
         {isCreateMode && (
-          <Grid.Col xs={8}>
+          <Grid.Col xs={12} md={8}>
             <TextInput
               id="newLogoUrl"
               name="newLogoUrl"
@@ -114,8 +139,13 @@ function CompanyAddEditDialog({
                 onChange(logo_url.split(" ").join("").trim(), "logo_url")
               }
               label="Domain Name"
-              helperText="eg. company.com | preview shows once you click away"
+              helperText="eg. microsoft.com"
               placeholder="microsoft.com"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  (e.target as HTMLInputElement).blur();
+                }
+              }}
               onBlur={() => {
                 if (
                   data.logo_url &&
@@ -127,55 +157,36 @@ function CompanyAddEditDialog({
                 } else {
                   setPreviewUrl("");
                   onChange("", "logo_url");
-                  showMsg(
-                    'Invalid domain make sure it does not have any special characters and has a single "." with atleast 3 characters'
-                  );
                 }
               }}
             />
           </Grid.Col>
         )}
-        {isCreateMode && (
+        {isCreateMode && previewUrl && (
           <Grid.Col
-            xs={4}
+            xs={12}
+            md={4}
             style={{
               display: "flex",
               justifyContent: "center",
               alignItems: "flex-start",
             }}
           >
-            {previewUrl && (
-              <Image
-                src={`${previewUrl}?size=50&format=png`}
-                width={50}
-                height={50}
-                alt={"company logo"}
-              />
-            )}
-            {!previewUrl && (
-              <div
-                style={{
-                  height: 50,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text>Logo Preview...</Text>
-              </div>
-            )}
+            <Image
+              src={`${previewUrl}?size=50&format=png`}
+              width={50}
+              height={50}
+              alt={"company logo"}
+            />
           </Grid.Col>
         )}
-        <Grid.Col xs={12}>
-          <Textarea
-            id="newDescription"
-            name="newDescription"
-            value={data.description || ""}
-            onChange={(e) => onChange(e.target.value, "description")}
-            label="Description"
-            placeholder="Global diversified tech company."
-            minRows={3}
-            autosize
+        <Grid.Col span={12}>
+          <DropZone
+            files={data.files}
+            onChange={(newFiles) => onChange(newFiles, "files")}
+            maxWidth={200}
+            maxHeight={200}
+            maxFiles={1}
           />
         </Grid.Col>
       </Grid>

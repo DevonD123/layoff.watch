@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Modal,
-  Grid,
-  TextInput,
-  Select,
-  Text,
-  Group,
-} from "@mantine/core";
+import { Button, Modal, Grid, TextInput, Select, Group } from "@mantine/core";
 import CompanySelect from "@c/Company/CompanySelect";
 import { IconPlus } from "@tabler/icons";
 import { DatePicker } from "@mantine/dates";
 import DropZone from "@c/DropZone/DropZone";
+import { addCSuitAsDraft } from "../Csuit/db";
+import showMsg from "@h/msg";
 
-const defaultState = {
+interface CsuitValues {
+  name: string;
+  bio: string;
+  role: string;
+  start: null | Date;
+  end: null | Date;
+  company: any[];
+}
+
+const defaultState: CsuitValues = {
   name: "",
-  img_url: "",
   bio: "",
   company: [],
   role: "",
@@ -43,10 +45,13 @@ const selectOpt = [
 
 function AddExecButton() {
   const [open, setOpen] = useState(false);
-  const [csuit, setCsuit] = useState(defaultState);
+  const [isLoading, setIsLoading] = useState(false);
+  const [csuit, setCsuit] = useState<CsuitValues>(defaultState);
+  const [files, setFiles] = useState<File[]>([]);
   useEffect(() => {
     if (open) {
       setCsuit(defaultState);
+      setFiles([]);
     }
   }, [open]);
 
@@ -56,7 +61,28 @@ function AddExecButton() {
   const doChange = (value: any, name: string) => {
     setCsuit({ ...csuit, [name]: value });
   };
-  const handleCreate = () => {};
+  const handleCreate = async () => {
+    try {
+      setIsLoading(true);
+      const result = await addCSuitAsDraft({
+        name: csuit.name,
+        company_id: csuit.company[0].id,
+        bio: csuit.bio,
+        end: csuit.end || undefined,
+        start: csuit.start!,
+        role: csuit.role,
+        file: files.length >= 1 ? files[0] : undefined,
+      });
+      if (result) {
+        setOpen(false);
+        showMsg("Thank you for adding an exec!", "success");
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <>
       <Button
@@ -129,7 +155,13 @@ function AddExecButton() {
             />
           </Grid.Col>
           <Grid.Col span={12}>
-            <DropZone maxFiles={1} />
+            <DropZone
+              files={files}
+              onChange={setFiles}
+              maxWidth={200}
+              maxHeight={200}
+              maxFiles={1}
+            />
           </Grid.Col>
           <Grid.Col span={12}>
             <Group position="right">
@@ -140,15 +172,18 @@ function AddExecButton() {
                 ml={20}
                 onClick={handleCreate}
                 disabled={
+                  isLoading ||
+                  !csuit.company ||
                   csuit.company.length <= 0 ||
                   csuit.name.length <= 0 ||
                   !csuit.name.includes(" ") ||
                   !csuit.role ||
-                  !csuit.start ||
-                  (csuit.end &&
-                    (csuit.end as Date).getTime() <=
-                      (csuit.start as Date).getTime())
+                  !csuit.start
+                  // ||  (csuit.end &&
+                  //     (csuit.end as Date).getTime() <=
+                  //      (csuit.start as Date).getTime())
                 }
+                loading={isLoading}
                 size="md"
               >
                 Create

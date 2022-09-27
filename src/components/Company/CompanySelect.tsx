@@ -6,6 +6,7 @@ import Select, { IOption, ISelectedRendererProps } from "@c/Input/Select";
 import { ICompanyOption } from "./types";
 import CompanyAddEditDialog from "./CompanyAddEditDialog";
 import { useCompanies, addCompanyAsDraft } from "./db";
+import getImage from "@h/getImage";
 
 type Props = {
   canCreate?: boolean;
@@ -24,6 +25,7 @@ const defaultNewCompany = {
   ticker: "",
   description: "",
   est_employee_count: "",
+  files: [],
   is_draft: true,
 };
 
@@ -60,6 +62,10 @@ function CompanySelect({
         ticker: newCompany.ticker,
         description: newCompany.description,
         est_employee_count: newCompany.est_employee_count as string,
+        file:
+          newCompany.files && newCompany.files.length >= 1
+            ? newCompany.files[0]
+            : undefined,
       });
 
       if (res) {
@@ -180,18 +186,28 @@ const CompanySelectTag = ({
   onRemove,
   ticker,
   logo_url,
+  uploaded_logo_key,
   ...props
-}: ISelectedRendererProps & { ticker?: string; logo_url?: string }) => {
-  const icon = logo_url ? (
-    <Avatar
-      style={{ marginRight: 10 }}
-      src={`${logo_url}?size=${15}&format=png`}
-      alt={label}
-      size={15}
-    />
-  ) : (
-    <></>
-  );
+}: ISelectedRendererProps & {
+  ticker?: string;
+  logo_url?: string;
+  uploaded_logo_key?: string;
+}) => {
+  const icon =
+    uploaded_logo_key || logo_url ? (
+      <Avatar
+        style={{ marginRight: 10 }}
+        src={getImage({
+          url: uploaded_logo_key,
+          fallbackUrl: logo_url,
+          size: 15,
+        })}
+        alt={label}
+        size={15}
+      />
+    ) : (
+      <></>
+    );
   return (
     <div {...props}>
       <RootTag

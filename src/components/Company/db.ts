@@ -8,6 +8,7 @@ import { supabase } from "@h/supabaseClient";
 import { ICompanyInput } from "./types";
 import { getValueForWholeNumber } from "./helper";
 import { getRangeValues } from "@h/pghelper";
+import uploadFile from "@h/uploadFile";
 
 export function useCompanies() {
   return useQuery(["company"], () =>
@@ -55,10 +56,13 @@ export async function addCompanyAsDraft({
   ticker,
   description,
   est_employee_count,
+  file,
 }: ICompanyInput) {
+  const key = await uploadFile("company-logo", file);
   const { data, error } = await supabase.from("company").insert({
     name,
     logo_url: logo_url ? `https://logo.clearbit.com/${logo_url}` : undefined,
+    uploaded_logo_key: key,
     ticker,
     description,
     est_employee_count: getValueForWholeNumber(est_employee_count),
@@ -91,8 +95,8 @@ export function useCompanyById(id: String) {
         .select(
           `
         *,
-        company_csuit(
-          start,end,
+        csuit_role(
+          role,start,end,
           csuit(*)
         )
         `

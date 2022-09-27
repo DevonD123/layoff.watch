@@ -6,6 +6,7 @@ type Props = {
   name: string;
   value: string | number;
   onChange: (val: any) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   label?: string | React.ReactElement;
   placeholder?: string;
   helperText?: React.ReactElement | string;
@@ -27,6 +28,7 @@ function TextInput({
   error,
   type,
   required,
+  onKeyDown,
 }: Props) {
   return (
     <MTextInput
@@ -42,6 +44,7 @@ function TextInput({
       placeholder={placeholder}
       description={helperText}
       onBlur={onBlur}
+      onKeyDown={onKeyDown}
       error={error}
     />
   );

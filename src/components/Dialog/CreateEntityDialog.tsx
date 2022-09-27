@@ -85,8 +85,8 @@ function CreateEntityDialog({
       <Group position="right" spacing="md">
         <Button
           onClick={closeWithHoldForLoading}
-          color="error"
-          variant="filled"
+          color="dark"
+          variant="subtle"
           disabled={isLoading}
         >
           Cancel

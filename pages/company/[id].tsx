@@ -42,7 +42,7 @@ const CompanyPg: NextPage = () => {
       {isLoading ? (
         <Skeleton height="200px" />
       ) : (
-        <ExecCard company_csuit={company.company_csuit} />
+        <ExecCard csuit_role={company.csuit_role} />
       )}
       <div style={{ height: 15, width: 1 }} />
       {isLoading ? (
@@ -70,10 +70,10 @@ const CompanyPg: NextPage = () => {
   );
 };
 
-const ExecCard = ({ company_csuit }: { company_csuit?: any[] }) => {
+const ExecCard = ({ csuit_role }: { csuit_role?: any[] }) => {
   const [open, setopen] = useState(false);
   const res = useMemo(() => {
-    if (!company_csuit || company_csuit.length <= 0) {
+    if (!csuit_role || csuit_role.length <= 0) {
       return null;
     }
 
@@ -81,16 +81,14 @@ const ExecCard = ({ company_csuit }: { company_csuit?: any[] }) => {
       current: [],
       past: [],
     };
-    for (let i = 0; i < company_csuit.length; i++) {
+    for (let i = 0; i < csuit_role.length; i++) {
       const item = {
-        start: company_csuit[i].start,
-        end: company_csuit[i].end,
-        ...company_csuit[i].csuit,
+        start: csuit_role[i].start,
+        end: csuit_role[i].end,
+        ...csuit_role[i].csuit,
+        role: csuit_role[i].role,
       };
-      if (
-        !company_csuit[i].start ||
-        (company_csuit[i].start && !company_csuit[i].end)
-      ) {
+      if (!csuit_role[i].start || (csuit_role[i].start && !csuit_role[i].end)) {
         data.current.push(item);
       } else {
         data.past.push(item);
@@ -98,7 +96,7 @@ const ExecCard = ({ company_csuit }: { company_csuit?: any[] }) => {
     }
 
     return data;
-  }, [company_csuit]);
+  }, [csuit_role]);
 
   if (res === null) {
     return (

@@ -16,6 +16,8 @@ import { useRecentCompany, fetchLayoffById } from "./db";
 import moment from "moment";
 import { supabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/router";
+import getImage from "@h/getImage";
+import useMediaQueries from "@h/hooks/useMediaQueries";
 
 type Props = {};
 
@@ -94,12 +96,14 @@ interface IData {
   amount: number;
   logo_url?: string;
   layoff_date?: string;
+  uploaded_logo_key?: string;
 }
 interface INewLayoff extends IData {
   company_name: string;
   percent?: number;
 }
 const RecentBar = ({}: Props) => {
+  const media = useMediaQueries();
   const [newLayoff, setNewLayoff] = useState<INewLayoff | null>(null);
   const { classes } = useStyles();
   const router = useRouter();
@@ -155,10 +159,14 @@ const RecentBar = ({}: Props) => {
             (!router.pathname.includes(newLayoff.company_id) ? (
               <div className={classes.collapse}>
                 <div className={classes.smallContainer}>
-                  {newLayoff.logo_url && (
+                  {(newLayoff.logo_url || newLayoff.uploaded_logo_key) && (
                     <Avatar
                       size="sm"
-                      src={`${newLayoff.logo_url}?size=20&format=png`}
+                      src={getImage({
+                        url: newLayoff.uploaded_logo_key,
+                        fallbackUrl: newLayoff?.logo_url,
+                        size: 25,
+                      })}
                       alt={newLayoff.name}
                     ></Avatar>
                   )}
@@ -244,7 +252,13 @@ const RecentBar = ({}: Props) => {
           controls: classes.controls,
           root: classes.root,
         }}
-        slideSize="65%"
+        slideSize={
+          media.isLargerThanTablet
+            ? media.isLargeDesktop
+              ? "15%"
+              : "25%"
+            : "65%"
+        }
         height={50}
         align="start"
         controlSize={14}
@@ -275,7 +289,11 @@ const RecentBar = ({}: Props) => {
                   }}
                   leftSection={
                     <Avatar
-                      src={x.logo_url && `${x.logo_url}?size=30&format=png`}
+                      src={getImage({
+                        url: x.uploaded_logo_key,
+                        fallbackUrl: x?.logo_url,
+                        size: 30,
+                      })}
                       alt={x.name}
                     ></Avatar>
                   }

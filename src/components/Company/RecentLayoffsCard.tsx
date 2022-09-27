@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { IconDotsVertical } from "@tabler/icons";
 import { useCompanyRecentLayoffs } from "./db";
+import getImage from "@h/getImage";
 
 type Props = {};
 
@@ -60,7 +61,11 @@ export default function RecentLayoffsCard({}: Props) {
                     style={{ border: "1px solid black" }}
                     radius="xl"
                     size="sm"
-                    src={c.logo_url && `${c.logo_url}?size=25&format=png`}
+                    src={getImage({
+                      url: c.uploaded_logo_key,
+                      fallbackUrl: c?.logo_url,
+                      size: 25,
+                    })}
                   >
                     {c.name.charAt(0)}
                   </Avatar>
@@ -134,7 +139,12 @@ export default function RecentLayoffsCard({}: Props) {
               radius="xl"
               size="lg"
               src={
-                selected?.logo_url && `${selected?.logo_url}?size=50&format=png`
+                selected &&
+                getImage({
+                  url: selected.uploaded_logo_key,
+                  fallbackUrl: selected?.logo_url,
+                  size: 50,
+                })
               }
             >
               {selected?.name?.charAt(0)}

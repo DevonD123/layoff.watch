@@ -9,6 +9,7 @@ create or replace function position_filtered_feed (p_id uuid, f text)
         is_completed BOOLEAN,
         company_name TEXT,
         company_logo_url TEXT,
+        uploaded_logo_key TEXT,
         company_ticker TEXT
     ) 
 language plpgsql
@@ -26,6 +27,7 @@ begin
                 l.is_completed as is_completed,
                 c.name as company_name,
                 c.logo_url as company_logo_url,
+                c.uploaded_logo_key as uploaded_logo_key,
                 c.ticker as company_ticker
             from position as p
                 join position_layoff pl on pl.position_id = p.id

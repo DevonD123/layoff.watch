@@ -5,6 +5,7 @@ export interface ICompanyOption {
   ticker?: string;
   description?: string;
   est_employee_count?: number | string;
+  files?: File[];
   is_draft: boolean;
 }
 export interface ICompanyInput {
@@ -13,4 +14,5 @@ export interface ICompanyInput {
   ticker?: string;
   description?: string;
   est_employee_count?: string;
+  file?: File;
 }

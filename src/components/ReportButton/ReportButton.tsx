@@ -19,16 +19,22 @@ export default function ReportButton({ type, id }: Props) {
         "error"
       );
     }
-    const { error } = await supabaseClient.from("report").insert({
-      report_id: id,
-      type,
-      info,
-    });
+    const { error } = await supabaseClient.from("report").insert(
+      {
+        report_id: id,
+        type,
+        info,
+      },
+      { returning: "minimal" }
+    );
     if (error) {
       console.error(error);
       return showMsg("Something happened please try again", "error");
     }
-    showMsg("success, thank you for your feedback we will look into this ASAP");
+    showMsg(
+      "success, thank you for your feedback we will look into this ASAP",
+      "success"
+    );
     setInfo("");
     setOpen(false);
   }

@@ -145,7 +145,7 @@ export function useLayoffPgData(id: string) {
   );
 }
 
-export function useLayoffsBetween(start: Date, companies: string[]) {
+export function useLayoffsBetween(start: any, companies: string[]) {
   return useQuery(
     ["useLayoffsBetween", { companies }],
     () =>
@@ -155,6 +155,6 @@ export function useLayoffsBetween(start: Date, companies: string[]) {
         .in("company_id", companies)
         .gte("layoff_date", start)
         .then(handleVisibleGenericErr),
-    { enabled: !!companies && companies.length >= 1 }
+    { enabled: !!companies && companies.length >= 1 && !!start }
   );
 }

@@ -8,13 +8,14 @@ import MoreInfoButton from "@c/MoreInfoButton/MoreInfoButton";
 import ReportButton from "@c/ReportButton/ReportButton";
 import { useCsuitById } from "@c/Csuit/db";
 import PositionTimeLine from "@c/Csuit/PositionTimeLine";
+import getImage from "@h/getImage";
+import VerifiedBadge from "@c/Verified/VerifiedBadge";
 
 const Home: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const { data, isLoading } = useCsuitById(id as string);
 
-  console.log(data);
   return (
     <MainLayout>
       <Head>
@@ -25,16 +26,19 @@ const Home: NextPage = () => {
       ) : (
         <Avatar
           style={{ width: 100, height: 100, margin: "0 auto" }}
-          src={data.img_url}
+          src={getImage({ fallbackUrl: data.img_url || "" })}
           alt={data.name}
         />
       )}
       {isLoading ? (
         <Skeleton width="90%" style={{ margin: "0 auto" }} />
       ) : (
-        <Title order={2} align="center">
-          {data.name}
-        </Title>
+        <>
+          <VerifiedBadge {...data} />
+          <Title order={2} align="center">
+            {data.name}
+          </Title>
+        </>
       )}
       {isLoading ? (
         <Skeleton width="90%" height={100} style={{ margin: "0 auto" }} />

@@ -34,6 +34,7 @@ const Home: NextPage = () => {
         name: x.company_name,
         ticker: x.company_ticker,
         logo_url: x.company_logo_url,
+        uploaded_logo_key: x.uploaded_logo_key,
         id: x.company_id,
       },
     }));

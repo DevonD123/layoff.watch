@@ -17,7 +17,7 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { useMinimalCompanyList } from "@c/Company/db";
 import Link from "next/link";
-import { IconLink } from "@tabler/icons";
+import { IconCaretRight, IconLink } from "@tabler/icons";
 import moment from "moment";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -136,7 +136,7 @@ const Home: NextPage = () => {
                     variant="light"
                     color="blue"
                   >
-                    <IconLink />
+                    <IconCaretRight />
                   </ActionIcon>
                 </Link>
               </Grid.Col>

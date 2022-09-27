@@ -95,7 +95,11 @@ const PositionTimeLine = (props: Props) => {
           Date.parse(a.start) > Date.parse(b.start) ? b.start : a.start
         )
       : [];
-  const { data } = useLayoffsBetween(orderedDates, companies);
+  //   const finalDate =
+  //     orderedDates.length >= 1 && orderedDates[0].start
+  //       ? orderedDates[0].start
+  //       : null;
+  const { data } = useLayoffsBetween(orderedDates?.start, companies);
   const results: ITimelineData[] = useMemo(() => {
     const layoffsMapped = (data || []).map((x: any) => ({
       ...x,
