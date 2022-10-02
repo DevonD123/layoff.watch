@@ -16,7 +16,13 @@ interface IData {
   yr: number;
   layoffs: number;
 }
-const LayoffLineChart = ({ id }: { id: string }) => {
+const LayoffLineChart = ({
+  id,
+  isSmallChart,
+}: {
+  id: string;
+  isSmallChart?: boolean;
+}) => {
   const theme = useMantineTheme();
   const { isLoading, error, data } = useCompanyLayoffHistory(id);
   if (error) {
@@ -78,8 +84,8 @@ const LayoffLineChart = ({ id }: { id: string }) => {
         </Text>
       ) : (
         <LineChart
-          width={300}
-          height={400}
+          width={isSmallChart ? 250 : 300}
+          height={isSmallChart ? 300 : 400}
           data={dataTransformed}
           margin={{
             top: 5,
@@ -89,8 +95,11 @@ const LayoffLineChart = ({ id }: { id: string }) => {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="yr" />
-          <YAxis />
+          <XAxis
+            dataKey="yr"
+            tick={{ fontSize: isSmallChart ? 11 : undefined }}
+          />
+          <YAxis tick={{ fontSize: isSmallChart ? 11 : undefined }} />
           <Tooltip />
           <Legend />
           <Line

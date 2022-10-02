@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import type { NextPage } from "next";
-import MainLayout from "@c/Layout";
+import MainLayout, { TwoColStack } from "@c/Layout";
 import { Skeleton, Text, Collapse, Anchor } from "@mantine/core";
 import { IconArrowDownCircle, IconId } from "@tabler/icons";
 import { useRouter } from "next/router";
@@ -15,9 +15,11 @@ import CsuitSection from "@c/Csuit/CsuitSection";
 import SubCard from "@c/Subsidiaries/SubCard";
 import ReportedPipCard from "@c/Pip/ReportedPipCard";
 import FreezeCard from "@c/Freeze/FreezeCard";
+import useMediaQueries from "@h/hooks/useMediaQueries";
 
 const CompanyPg: NextPage = () => {
   const router = useRouter();
+  const { isLargerThanTablet } = useMediaQueries();
   const { id } = router.query;
   const { data: company, isLoading } = useCompanyById(id as string);
   return (
@@ -30,40 +32,49 @@ const CompanyPg: NextPage = () => {
       {isLoading ? (
         <Skeleton height="300px" />
       ) : (
-        <CompanySection {...company} hasLink={false} />
+        <CompanySection
+          {...company}
+          hasLink={false}
+          topRightComponent={
+            isLargerThanTablet ? (
+              <CompanyLayoffHistoryLineChart id={company.id} isSmallChart />
+            ) : undefined
+          }
+        />
       )}
-      <div style={{ height: 15, width: 1 }} />
-      {isLoading ? (
-        <Skeleton />
-      ) : (
-        <CompanyLayoffHistoryLineChart id={company.id} />
-      )}
-      <div style={{ height: 15, width: 1 }} />
-      {isLoading ? (
-        <Skeleton height="200px" />
-      ) : (
-        <ExecCard csuit_role={company.csuit_role} />
-      )}
-      <div style={{ height: 15, width: 1 }} />
-      {isLoading ? (
-        <Skeleton height="200px" />
-      ) : (
-        <ReportedPipCard company_id={company.id} />
-      )}
+      <div style={{ height: 20, width: 1 }} />
+      <TwoColStack>
+        {isLargerThanTablet ? null : isLoading ? (
+          <Skeleton />
+        ) : (
+          <CompanyLayoffHistoryLineChart id={company.id} />
+        )}
 
-      <div style={{ height: 15, width: 1 }} />
-      {isLoading ? (
-        <Skeleton height="200px" />
-      ) : (
-        <FreezeCard company_id={company.id} />
-      )}
-      <div style={{ height: 15, width: 1 }} />
-      {isLoading ? (
-        <Skeleton height="100px" />
-      ) : (
-        <SubCard company_id={company.id} />
-      )}
-      <div style={{ height: 15, width: 1 }} />
+        {isLoading ? (
+          <Skeleton height="200px" />
+        ) : (
+          <ExecCard csuit_role={company.csuit_role} />
+        )}
+
+        {isLoading ? (
+          <Skeleton height="200px" />
+        ) : (
+          <ReportedPipCard company_id={company.id} />
+        )}
+
+        {isLoading ? (
+          <Skeleton height="200px" />
+        ) : (
+          <FreezeCard company_id={company.id} />
+        )}
+
+        {isLoading ? (
+          <Skeleton height="100px" />
+        ) : (
+          <SubCard company_id={company.id} />
+        )}
+      </TwoColStack>
+
       {!isLoading && <MoreInfoButton id={id as string} type="layoff" />}
       {!isLoading && <ReportButton id={id as string} type="layoff" />}
     </MainLayout>

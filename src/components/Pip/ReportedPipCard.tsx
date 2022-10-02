@@ -39,16 +39,14 @@ function ReportedPipCard({ company_id }: Props) {
                 {report.title}
               </Text>
             </Grid.Col>
-            {!report.is_completed && (
-              <Grid.Col span={5} pt={0}>
+
+            <Grid.Col span={5} pt={0}>
+              {!report.is_completed && (
                 <Text align="left">{report.percent}% target</Text>
-              </Grid.Col>
-            )}
-            <Grid.Col span={report.is_completed ? 10 : 5} pt={0}>
-              <Text
-                color="dimmed"
-                align={report.is_completed ? "left" : "right"}
-              >
+              )}
+            </Grid.Col>
+            <Grid.Col span={5} pt={0}>
+              <Text color="dimmed" align={"right"}>
                 {report.is_completed ? "End " : "Start "}
                 {moment(report.layoff_date).format("M/d/yyyy")}
               </Text>

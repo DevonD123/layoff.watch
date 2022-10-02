@@ -1,5 +1,8 @@
 import React from "react";
 import styled from "@emotion/styled";
+import { useMediaQuery } from "@mantine/hooks";
+import { useRouter } from "next/router";
+import { Text } from "@mantine/core";
 
 const StyledContainer = styled.div`
   display: flex;
@@ -7,7 +10,7 @@ const StyledContainer = styled.div`
   flex-wrap: nowrap;
   gap: 10px;
   @media (max-width: 950px) {
-    flex-direction: column;
+    flex-direction: column; // will never use this but good for the initial flash
   }
 `;
 
@@ -20,19 +23,32 @@ const SidebarContainer = styled.div`
   flex-direction: column;
   flex: 1;
   min-width: 250px;
-  background-color: blue;
-  @media (max-width: 950px) {
-    /* height: 100%; */
-  }
+  flex-direction: column;
+  gap: 15px;
+  text-align: center;
 `;
 
-function ContentWithSidebar({ children }: React.PropsWithChildren<{}>) {
+const ContentWithSidebar = ({ children }: React.PropsWithChildren<{}>) => {
+  const showSidebar = useMediaQuery("(min-width: 950px)");
   return (
     <StyledContainer>
       <MainContnet>{children}</MainContnet>
-      <SidebarContainer>sidebar</SidebarContainer>
+      {false && showSidebar && (
+        <SidebarContainer>
+          <SidebarList />
+        </SidebarContainer>
+      )}
     </StyledContainer>
   );
-}
+};
+
+const SidebarList = () => {
+  const router = useRouter();
+  return (
+    <>
+      <Text>Sidebar</Text>
+    </>
+  );
+};
 
 export default ContentWithSidebar;

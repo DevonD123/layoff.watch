@@ -2,7 +2,12 @@ import React, { useMemo, useEffect } from "react";
 import { Text, ThemeIcon, Avatar } from "@mantine/core";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabaseClient } from "@supabase/auth-helpers-nextjs";
-import { IconChartBar, IconFlame, IconSnowflake } from "@tabler/icons";
+import {
+  IconChartBar,
+  IconFlame,
+  IconSnowflake,
+  IconBuilding,
+} from "@tabler/icons";
 import moment from "moment";
 import { ReportType } from "./types";
 import List, { ListItem, LoadingListItem, AvatarWrapper } from "@c/List";
@@ -78,7 +83,9 @@ const Feed = ({ fetchPg, cacheKey = "layoff_feed", cacheObj = {} }: Props) => {
           className="avatar"
           src={companyLogo}
           alt={companyName}
-        />
+        >
+          <IconBuilding size={45} />
+        </Avatar>
         <div className="subIcon">
           <ThemeIcon color={IconMap[type].color} size={24} radius="xl">
             <Icon size={24} />
@@ -179,7 +186,7 @@ const Feed = ({ fetchPg, cacheKey = "layoff_feed", cacheObj = {} }: Props) => {
   }, []);
 
   return (
-    <List title="Recent" paged hasNext={hasNextPage}>
+    <List paged hasNext={hasNextPage}>
       {isLoading &&
         [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x: number) => (
           <LoadingListItem key={x} />

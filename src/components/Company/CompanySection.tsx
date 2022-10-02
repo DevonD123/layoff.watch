@@ -24,6 +24,7 @@ interface Props extends PropsWithChildren<{}> {
   est_employee_count?: number;
   hasLink?: boolean;
   verified?: boolean;
+  topRightComponent?: JSX.Element;
 }
 
 export default function CompanySection({
@@ -35,6 +36,7 @@ export default function CompanySection({
   est_employee_count,
   hasLink = true,
   verified,
+  topRightComponent,
   children,
 }: Props) {
   const { data, isLoading } = useTopPipAndFreeze(id);
@@ -48,110 +50,169 @@ export default function CompanySection({
     data.findIndex((x: any) => x.type === ReportType.Freeze && !x.is_complete);
   return (
     <Card>
-      {hasLink ? (
-        <Link href={`/company/${id}`} passHref>
-          <a>
-            <div style={{ position: "relative" }}>
-              <Avatar
-                style={{ height: 150, width: 150 }}
-                src={logo_url}
-                alt={name}
-              />
+      <ContentWrapper rightComponent={topRightComponent}>
+        {hasLink ? (
+          <Link href={`/company/${id}`} passHref>
+            <a>
+              <div style={{ position: "relative" }}>
+                <Avatar
+                  style={{ height: 150, width: 150 }}
+                  src={logo_url}
+                  alt={name}
+                />
 
-              <IconLink style={{ position: "absolute", top: -10, left: -10 }} />
+                <IconLink
+                  style={{ position: "absolute", top: -10, left: -10 }}
+                />
+              </div>
+            </a>
+          </Link>
+        ) : (
+          <div style={{ position: "relative" }}>
+            <Avatar
+              style={{ height: 150, width: 150 }}
+              src={logo_url}
+              alt={name}
+            />
+            <div
+              style={{
+                position: "absolute",
+                bottom: 2,
+                right: 2,
+                opacity: 0.7,
+              }}
+            >
+              <VerifiedBadge verified={verified} />
             </div>
-          </a>
-        </Link>
-      ) : (
-        <Avatar style={{ height: 150, width: 150 }} src={logo_url} alt={name} />
-      )}
-      <VerifiedBadge verified={verified} />
-      <Bubble>
-        <Text color="black" size="xl">
-          {name}{" "}
-          {ticker && (
-            <Text color="dimmed" size="md" component="span">
-              ({ticker})
+          </div>
+        )}
+        <Bubble>
+          <Text color="black" size="xl">
+            {name}{" "}
+            {ticker && (
+              <Text color="dimmed" size="md" component="span">
+                ({ticker})
+              </Text>
+            )}
+          </Text>
+        </Bubble>
+        {est_employee_count && (
+          <Bubble>
+            <Text color="dimmed" size="md">
+              Est. Employees {est_employee_count}
             </Text>
-          )}
-        </Text>
-      </Bubble>
-      {est_employee_count && (
-        <Bubble>
-          <Text color="dimmed" size="md">
-            Est. Employees {est_employee_count}
-          </Text>
-        </Bubble>
-      )}
-      {description && (
-        <Bubble>
-          <Text color="gray" size="md">
-            {description}
-          </Text>
-        </Bubble>
-      )}
-      <div>
-        <Group position="center" mt={15}>
-          {isLoading ? (
-            <Skeleton width={75} height={25} radius="lg" />
-          ) : (
-            <Badge
-              size="lg"
-              radius="xl"
-              // color="orange"
-              color={pipIndex ? "orange" : "green"}
-              pl={0}
-              leftSection={<IconChartBar size={15} />}
-              styles={{
-                leftSection: {
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                },
-              }}
-            >
-              <span
-                style={{
-                  textTransform: "none",
+          </Bubble>
+        )}
+        {description && (
+          <Bubble>
+            <Text color="gray" size="md">
+              {description}
+            </Text>
+          </Bubble>
+        )}
+        <div>
+          <Group position="center" mt={15}>
+            {isLoading ? (
+              <Skeleton width={75} height={25} radius="lg" />
+            ) : (
+              <Badge
+                size="lg"
+                radius="xl"
+                // color="orange"
+                color={pipIndex ? "orange" : "green"}
+                pl={0}
+                leftSection={<IconChartBar size={15} />}
+                styles={{
+                  leftSection: {
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
                 }}
               >
-                {pipIndex ? `PIP ${data[pipIndex].percent}% target` : `No PIP`}
-              </span>
-            </Badge>
-          )}
-          {isLoading ? (
-            <Skeleton width={75} height={25} radius="lg" />
-          ) : (
-            <Badge
-              size="lg"
-              radius="xl"
-              color={freezeIndex ? "orange" : "green"}
-              pl={0}
-              styles={{
-                leftSection: {
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                },
-              }}
-              leftSection={<IconSnowflake size={15} />}
-            >
-              <span
-                style={{
-                  textTransform: "none",
+                <span
+                  style={{
+                    textTransform: "none",
+                  }}
+                >
+                  {pipIndex
+                    ? `PIP ${data[pipIndex].percent}% target`
+                    : `No PIP`}
+                </span>
+              </Badge>
+            )}
+            {isLoading ? (
+              <Skeleton width={75} height={25} radius="lg" />
+            ) : (
+              <Badge
+                size="lg"
+                radius="xl"
+                color={freezeIndex ? "orange" : "green"}
+                pl={0}
+                styles={{
+                  leftSection: {
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
                 }}
+                leftSection={<IconSnowflake size={15} />}
               >
-                {freezeIndex ? `Hiring Freeze` : `Hiring`}
-              </span>
-            </Badge>
-          )}
-        </Group>
-      </div>
+                <span
+                  style={{
+                    textTransform: "none",
+                  }}
+                >
+                  {freezeIndex ? `Hiring Freeze` : `Hiring`}
+                </span>
+              </Badge>
+            )}
+          </Group>
+        </div>
+      </ContentWrapper>
 
       {children && <div style={{ marginTop: 20 }}>{children}</div>}
     </Card>
   );
 }
+
+const ContentWrapper = ({
+  children,
+  rightComponent,
+}: PropsWithChildren<{ rightComponent?: JSX.Element }>) => {
+  if (!rightComponent) {
+    return <>{children}</>;
+  }
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "100%",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          flexGrow: 5,
+        }}
+      >
+        {children}
+      </div>
+      <div
+        style={{
+          flexGrow: 0,
+        }}
+      >
+        {rightComponent}
+      </div>
+    </div>
+  );
+};
 
 export const Bubble = ({ children }: PropsWithChildren<{}>) => (
   <BubbleInner px={"lg"} py={0}>

@@ -2,7 +2,7 @@ import React from "react";
 import MainLayout from "@c/Layout";
 import useRequiredUser from "@h/useRequiredUser";
 import { supabaseClient } from "@supabase/auth-helpers-nextjs";
-import { Anchor } from "@mantine/core";
+import { Anchor, Text } from "@mantine/core";
 import { IconLogout } from "@tabler/icons";
 import Link from "next/link";
 
@@ -16,7 +16,12 @@ const Account = ({}: Props) => {
   return (
     <MainLayout>
       {isLoading && "Loading...."}
-      {user?.email}
+      {user?.email}{" "}
+      {user?.user_metadata?.isAdmin && (
+        <Text color="red" ml={5} component="span">
+          (Admin)
+        </Text>
+      )}
       <br />
       <br />
       {!isLoading && (

@@ -17,7 +17,7 @@ import { User } from "@supabase/supabase-js";
 type Props = {
   open: boolean;
   onClose: () => void;
-  user: User | null;
+  userEmail?: string;
 };
 
 const defaultState: IReportData = {
@@ -36,7 +36,7 @@ const defaultState: IReportData = {
   type: ReportType.Layoff,
 };
 
-export default function ClientLayoffForm({ onClose, open, user }: Props) {
+export default function ClientLayoffForm({ onClose, open, userEmail }: Props) {
   const [data, setData] = useState<IReportData>(defaultState);
   const [addToList, setAddToList] = useState(true);
   const [company, setCompany] = useState<any[]>([]);
@@ -117,7 +117,7 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
         source_displayRef.current?.focus();
         break;
       case "source_display":
-        !!user && sub_emailRef.current?.focus();
+        !!userEmail && sub_emailRef.current?.focus();
         break;
       default:
         break;
@@ -125,10 +125,10 @@ export default function ClientLayoffForm({ onClose, open, user }: Props) {
   }
 
   useEffect(() => {
-    if (user && user.email) {
-      setData((data) => ({ ...data, sub_email: user.email as string }));
+    if (userEmail) {
+      setData((data) => ({ ...data, sub_email: userEmail as string }));
     }
-  }, [user]);
+  }, [userEmail]);
 
   return (
     <Grid style={{ height: "100%", overflowY: "auto", paddingBottom: "2em" }}>

@@ -1,13 +1,7 @@
 import React from "react";
 import Card from "@c/Card/Card";
 import { Text, Grid, ActionIcon } from "@mantine/core";
-import {
-  IconLink,
-  IconSnowflake,
-  IconSnowflakeOff,
-  IconAlertTriangle,
-  IconCircleCheck,
-} from "@tabler/icons";
+import { IconLink, IconSnowflake } from "@tabler/icons";
 import Link from "next/link";
 import { useFreezeReports } from "./db";
 import moment from "moment";
@@ -34,6 +28,7 @@ function FreezeCard({ company_id }: Props) {
             key={report.id}
             sx={(theme) => ({
               borderBottom: `1px solid ${theme.colors.gray[4]}`,
+              width: "100%",
             })}
             mb={5}
           >

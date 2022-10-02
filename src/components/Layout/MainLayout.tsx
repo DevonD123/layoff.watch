@@ -13,6 +13,7 @@ import {
   Drawer,
   Skeleton,
   NavLink,
+  Switch,
 } from "@mantine/core";
 import {
   IconBrandApple,
@@ -31,6 +32,12 @@ import { User } from "@supabase/supabase-js";
 import RecentBar from "@c/Recent";
 import QSP from "@h/qsp";
 import dynamic from "next/dynamic";
+import {
+  InternalUserProvider,
+  useInternalUser,
+  IInternalUserContext,
+  IInternalUser,
+} from "@h/context/userContext";
 
 interface IProps extends PropsWithChildren<{}> {}
 
@@ -46,7 +53,7 @@ const Links = ({
   isLargerThanTable,
 }: {
   currentPath: string;
-  user: User | null;
+  user?: IInternalUser;
   isLargerThanTable: boolean;
 }) => {
   if (isLargerThanTable) {
@@ -162,7 +169,7 @@ const MainLayout = ({ children }: IProps) => {
   const media = useMediaQueries();
   const router = useRouter();
   const theme = useMantineTheme();
-  const { user, error } = useUser();
+  const { user, isLoading, isEditMode, setEdit } = useInternalUser();
   const [openReportLayoff, setopenReportLayoff] = useState(false);
   const [opened, setOpened] = useState(false);
 
@@ -175,7 +182,6 @@ const MainLayout = ({ children }: IProps) => {
         },
       }}
       navbarOffsetBreakpoint={mobileBreakPoint}
-      //   asideOffsetBreakpoint={mobileBreakPoint}
       navbar={
         <Navbar
           p="md"
@@ -192,6 +198,14 @@ const MainLayout = ({ children }: IProps) => {
           <div style={{ width: "100%", height: 300 }}>
             <Chart showYTicks={media.isLargeDesktop} />
           </div>
+
+          {media.isLargeDesktop && user?.isAdmin && (
+            <Switch
+              label="Edit mode"
+              checked={isEditMode}
+              onChange={(e) => setEdit(e.target.checked)}
+            />
+          )}
         </Navbar>
       }
       footer={
@@ -269,7 +283,7 @@ const MainLayout = ({ children }: IProps) => {
         )}
         {user && (
           <ClientLayoffForm
-            user={user}
+            userEmail={user.email}
             open={openReportLayoff}
             onClose={closeReportLayoff}
           />
@@ -302,4 +316,10 @@ const BackButton = ({
   );
 };
 
-export default MainLayout;
+const MainLayoutWrapper = ({ children }: PropsWithChildren<{}>) => (
+  <InternalUserProvider>
+    <MainLayout>{children}</MainLayout>
+  </InternalUserProvider>
+);
+
+export default MainLayoutWrapper;

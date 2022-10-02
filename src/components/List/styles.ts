@@ -1,6 +1,9 @@
 import styled from "@emotion/styled";
-import { List } from "@mantine/core";
+import { List, TextInput } from "@mantine/core";
 
+export const ListFilterInput = styled(TextInput)`
+  margin-bottom: 20px;
+`;
 export const StyledListContainer = styled.div`
   width: 100%;
   max-width: 600px;

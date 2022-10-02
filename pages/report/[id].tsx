@@ -17,8 +17,10 @@ import CompanyLayoffHistoryLineChart from "@c/Chart/CompanyLayoffHistoryLineChar
 import { ReportType } from "@c/Layoff/types";
 import getCompltedStatusIcon from "@h/getCompletedStatusIcon";
 import VerifiedBadge from "@c/Verified/VerifiedBadge";
+import useMediaQueries from "@h/hooks/useMediaQueries";
 
 const Home: NextPage = () => {
+  const { isLargerThanTablet } = useMediaQueries();
   const router = useRouter();
   const { id } = router.query;
   const { data, isLoading } = useLayoffPgData(id as string);
@@ -35,7 +37,9 @@ const Home: NextPage = () => {
       ) : (
         <>
           <VerifiedBadge {...data} />
-          <Title order={2}>{data.title}</Title>
+          <Title order={2} align="center">
+            {data.title}
+          </Title>
         </>
       )}
       {isLoading ? (
@@ -86,7 +90,17 @@ const Home: NextPage = () => {
       {isLoading ? (
         <Skeleton height={200} width="100%" />
       ) : (
-        <CompanySection {...data.company}>
+        <CompanySection
+          {...data.company}
+          topRightComponent={
+            isLargerThanTablet ? (
+              <CompanyLayoffHistoryLineChart
+                id={data.company_id}
+                isSmallChart
+              />
+            ) : undefined
+          }
+        >
           <div style={{ marginTop: 20 }}>
             {data.csuit_layoff.map((cl: any) => (
               <CsuitSection key={cl.csuit.id} {...cl.csuit} />
@@ -95,13 +109,6 @@ const Home: NextPage = () => {
         </CompanySection>
       )}
       <div style={{ height: 20, width: 20 }} />
-
-      {isLoading ? (
-        <Skeleton />
-      ) : (
-        <CompanyLayoffHistoryLineChart id={data.company_id} />
-      )}
-      <div style={{ height: 15, width: 1 }} />
       {isLoading ? (
         <Skeleton />
       ) : !data.extra_info ? null : (
@@ -122,7 +129,11 @@ const Home: NextPage = () => {
         </Link>
       )}
       <div style={{ height: 15, width: 1 }} />
-
+      {isLargerThanTablet ? null : isLoading ? (
+        <Skeleton />
+      ) : (
+        <CompanyLayoffHistoryLineChart id={data.company_id} />
+      )}
       {!isLoading && <MoreInfoButton id={id as string} type="layoff" />}
       {!isLoading && <ReportButton id={id as string} type="layoff" />}
     </MainLayout>
