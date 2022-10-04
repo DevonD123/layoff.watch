@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { Button, Modal, Grid, TextInput, Select, Group } from "@mantine/core";
-import CompanySelect from "@c/Company/CompanySelect";
-import { IconPlus } from "@tabler/icons";
-import { DatePicker } from "@mantine/dates";
-import DropZone from "@c/DropZone/DropZone";
-import { addCSuitAsDraft } from "../Csuit/db";
-import showMsg from "@h/msg";
+import React, { useState, useEffect } from 'react';
+import { Button, Modal, Grid, TextInput, Select, Group } from '@mantine/core';
+import CompanySelect from '@c/Company/CompanySelect';
+import { IconPlus } from '@tabler/icons';
+import { DatePicker } from '@mantine/dates';
+import DropZone from '@c/DropZone/DropZone';
+import { addCSuitAsDraft } from '../Csuit/db';
+import showMsg from '@h/msg';
+import RoleSelect from '@c/Csuit/RoleSelect';
 
 interface CsuitValues {
   name: string;
@@ -17,31 +18,13 @@ interface CsuitValues {
 }
 
 const defaultState: CsuitValues = {
-  name: "",
-  bio: "",
+  name: '',
+  bio: '',
   company: [],
-  role: "",
+  role: '',
   start: null,
   end: null,
 };
-const selectOpt = [
-  {
-    value: "CEO",
-    label: "CEO",
-  },
-  {
-    value: "CTO",
-    label: "CTO",
-  },
-  {
-    value: "CFO",
-    label: "CFO",
-  },
-  {
-    value: "CMO",
-    label: "CMO",
-  },
-];
 
 function AddExecButton() {
   const [open, setOpen] = useState(false);
@@ -75,7 +58,7 @@ function AddExecButton() {
       });
       if (result) {
         setOpen(false);
-        showMsg("Thank you for adding an exec!", "success");
+        showMsg('Thank you for adding an exec!', 'success');
       }
     } catch (e) {
       console.error(e);
@@ -106,7 +89,7 @@ function AddExecButton() {
               isSingleSelect
               dropdownPosition="bottom"
               values={csuit.company}
-              onChange={(newCompany) => doChange(newCompany, "company")}
+              onChange={(newCompany) => doChange(newCompany, 'company')}
             />
           </Grid.Col>
           <Grid.Col span={8}>
@@ -121,15 +104,10 @@ function AddExecButton() {
             />
           </Grid.Col>
           <Grid.Col span={4}>
-            <Select
+            <RoleSelect
               required
-              name="role"
-              value={csuit.role}
-              onChange={(newVal) => doChange(newVal, "role")}
-              label="Role"
-              description="Current position"
-              data={selectOpt}
-              placeholder="CEO"
+              role={csuit.role}
+              setRole={(newVal: string | null) => doChange(newVal, 'role')}
             />
           </Grid.Col>
           <Grid.Col span={6}>
@@ -138,7 +116,7 @@ function AddExecButton() {
               disabled={!csuit.company[0]}
               required
               value={csuit.start}
-              onChange={(newDate: Date) => doChange(newDate, "start")}
+              onChange={(newDate: Date) => doChange(newDate, 'start')}
               placeholder="First day"
             />
           </Grid.Col>
@@ -147,7 +125,7 @@ function AddExecButton() {
               label="End"
               disabled={!csuit.company[0] || !csuit.start}
               value={csuit.end}
-              onChange={(newDate: Date) => doChange(newDate, "end")}
+              onChange={(newDate: Date) => doChange(newDate, 'end')}
               placeholder="Last day"
               excludeDate={(date) =>
                 date.getTime() <= (csuit.start! as Date).getTime()
@@ -176,7 +154,7 @@ function AddExecButton() {
                   !csuit.company ||
                   csuit.company.length <= 0 ||
                   csuit.name.length <= 0 ||
-                  !csuit.name.includes(" ") ||
+                  !csuit.name.includes(' ') ||
                   !csuit.role ||
                   !csuit.start
                   // ||  (csuit.end &&

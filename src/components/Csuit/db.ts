@@ -184,6 +184,57 @@ export async function addCSuitAsDraft({
   return { ...link[0], csuit: data[0] };
 }
 
+interface IAddRoleProps {
+id:string,
+  company_id:string,
+  role:String
+  start: Date,
+  end:Date | null
+}
+export async function addRole({
+  role,start,end,company_id,id
+}:IAddRoleProps){
+  if(!end){
+    const success =  await insertRole({
+      id,role,start,company_id,end:null
+    })
+    return success;
+  }
+      const {error} = await supabase.from('csuit_role').update({
+        end: start
+      }).match({
+        end: null,
+        csuit_id: id
+      })
+      if(error){
+        showMsg("Error update the last positions end date")
+        console.error(error)
+        return false;
+      }
+
+    const success =  await insertRole({
+      id,role,start,company_id,end
+    })
+    return success;
+  }
+
+  async function insertRole({id,company_id,role,start,end}:IAddRoleProps){
+    const {data,error} = await supabase.from('csuit_role').insert({
+      csuit_id:id,
+      company_id,
+      role,
+      start,
+      end
+    })
+
+    if(error){
+      showMsg('Error adding the role please try agin later.','error')
+      console.error(error)
+      return false
+    }
+    return true
+  }
+
 export function useCsuitById(csuit_id?: string) {
   return useQuery(
     ["useCsuitById", { csuit_id }],

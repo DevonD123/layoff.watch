@@ -1,16 +1,16 @@
-import React, { useMemo, useEffect } from "react";
-import { Text, ThemeIcon, Avatar } from "@mantine/core";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { supabaseClient } from "@supabase/auth-helpers-nextjs";
+import React, { useMemo, useEffect } from 'react';
+import { Text, ThemeIcon, Avatar } from '@mantine/core';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import {
   IconChartBar,
   IconFlame,
   IconSnowflake,
   IconBuilding,
-} from "@tabler/icons";
-import moment from "moment";
-import { ReportType } from "./types";
-import List, { ListItem, LoadingListItem, AvatarWrapper } from "@c/List";
+} from '@tabler/icons';
+import moment from 'moment';
+import { ReportType } from './types';
+import List, { ListItem, LoadingListItem, AvatarWrapper } from '@c/List';
 
 type Props = {
   fetchPg?: (obj: { pageParam?: number }) => Promise<IPageData>;
@@ -21,9 +21,9 @@ type Props = {
 export const PER_PG = 50;
 const fetchFeed = async ({ pageParam = 1 }): Promise<IPageData> => {
   const { data, error, count } = await supabaseClient
-    .from("layoff")
-    .select("*,company(*)", { count: "exact" })
-    .order("layoff_date", { ascending: false })
+    .from('layoff')
+    .select('*,company(*)', { count: 'exact' })
+    .order('layoff_date', { ascending: false })
     .range((pageParam - 1) * PER_PG, pageParam * PER_PG);
   if (error) {
     throw error;
@@ -33,15 +33,15 @@ const fetchFeed = async ({ pageParam = 1 }): Promise<IPageData> => {
 
 export const IconMap = {
   [ReportType.Layoff]: {
-    color: "red",
+    color: 'red',
     icon: IconFlame,
   },
   [ReportType.Freeze]: {
-    color: "blue",
+    color: 'blue',
     icon: IconSnowflake,
   },
   [ReportType.Pip]: {
-    color: "orange",
+    color: 'orange',
     icon: IconChartBar,
   },
 };
@@ -50,11 +50,11 @@ export interface IPageData {
   items: any[];
   total: number;
 }
-const Feed = ({ fetchPg, cacheKey = "layoff_feed", cacheObj = {} }: Props) => {
+const Feed = ({ fetchPg, cacheKey = 'layoff_feed', cacheObj = {} }: Props) => {
   const { data, isLoading, isFetching, fetchNextPage, hasNextPage, error } =
     useInfiniteQuery(
       [cacheKey, cacheObj],
-      typeof fetchPg === "function" ? fetchPg : fetchFeed,
+      typeof fetchPg === 'function' ? fetchPg : fetchFeed,
       {
         getNextPageParam: (lastPage: IPageData, pages: IPageData[]) => {
           const maxPg = lastPage.total / PER_PG;
@@ -105,12 +105,13 @@ const Feed = ({ fetchPg, cacheKey = "layoff_feed", cacheObj = {} }: Props) => {
     const text: IText = {
       number: null,
     };
-    if (report.type === ReportType.Pip) {
+    if (report.type === ReportType.Pip && report.percent) {
       text.number = `${report.percent}% target`;
     }
     if (
       report.type === ReportType.Layoff &&
-      typeof report.number === "number"
+      typeof report.number === 'number' &&
+      report.number >= 0
     ) {
       text.number = `${report.number.toLocaleString()} laid off`;
     }
@@ -130,7 +131,7 @@ const Feed = ({ fetchPg, cacheKey = "layoff_feed", cacheObj = {} }: Props) => {
         verified={report.verified}
         left={
           <span>
-            {report.company.name}{" "}
+            {report.company.name}{' '}
             {report.company.ticker && (
               <Text color="dimmed" size="xs" align="left" component="span">
                 ({report.company.ticker})
@@ -140,7 +141,7 @@ const Feed = ({ fetchPg, cacheKey = "layoff_feed", cacheObj = {} }: Props) => {
         }
         rightTop={text.number || undefined}
         rightBottom={`Affective ${moment(report.layoff_date).format(
-          "M/d/yyyy"
+          'M/d/yyyy'
         )}`}
         link={`/report/${report.id}`}
       />
@@ -180,8 +181,8 @@ const Feed = ({ fetchPg, cacheKey = "layoff_feed", cacheObj = {} }: Props) => {
         await fetchNextPage();
       }
     };
-    document.addEventListener("scroll", handlePg);
-    return () => document.removeEventListener("scroll", handlePg);
+    document.addEventListener('scroll', handlePg);
+    return () => document.removeEventListener('scroll', handlePg);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

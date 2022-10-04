@@ -21,17 +21,11 @@ export default function ConcentProvider({}: Props) {
             marginLeft: theme.spacing.md,
             marginRight: theme.spacing.md,
             backgroundColor:
-              theme.colorScheme === "dark"
-                ? theme.colors.green[5]
-                : theme.colors.green[1],
+               theme.colors.green[5],
             color:
-              theme.colorScheme === "dark"
-                ? theme.colors.white[5]
-                : theme.colors.gray[1],
+               theme.colors.gray[1],
             border: `1px solid ${
-              theme.colorScheme === "dark"
-                ? theme.colors.green[8]
-                : theme.colors.green[5]
+               theme.colors.green[5]
             }`,
             cursor: "pointer",
             padding: theme.spacing.sm,
@@ -41,17 +35,11 @@ export default function ConcentProvider({}: Props) {
         customDeclineButtonProps={{
           style: {
             backgroundColor:
-              theme.colorScheme === "dark"
-                ? theme.colors.red[5]
-                : theme.colors.red[1],
+               theme.colors.red[6],
             color:
-              theme.colorScheme === "dark"
-                ? theme.colors.white[5]
-                : theme.colors.gray[1],
+               theme.colors.gray[1],
             border: `1px solid ${
-              theme.colorScheme === "dark"
-                ? theme.colors.red[8]
-                : theme.colors.red[5]
+               theme.colors.red[5]
             }`,
             cursor: "pointer",
             padding: theme.spacing.xs,

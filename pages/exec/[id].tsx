@@ -10,6 +10,7 @@ import { useCsuitById } from "@c/Csuit/db";
 import PositionTimeLine from "@c/Csuit/PositionTimeLine";
 import getImage from "@h/getImage";
 import VerifiedBadge from "@c/Verified/VerifiedBadge";
+import AddRoleButton from "@c/AddRoleButton/AddRoleButton";
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -49,7 +50,7 @@ const Home: NextPage = () => {
           </Text>
           <Group position="center">
             <Button size="xs">Report a bonus</Button>
-            <Button size="xs">Add a role</Button>
+            <AddRoleButton id={id as string} name={data.name}  />
           </Group>
         </>
       )}
