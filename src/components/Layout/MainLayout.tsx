@@ -1,4 +1,4 @@
-import { useState, PropsWithChildren } from "react";
+import { useState, PropsWithChildren } from 'react';
 import {
   AppShell,
   Navbar,
@@ -14,7 +14,7 @@ import {
   Skeleton,
   NavLink,
   Switch,
-} from "@mantine/core";
+} from '@mantine/core';
 import {
   IconBrandApple,
   IconIdBadge,
@@ -22,31 +22,30 @@ import {
   IconLockAccess,
   IconHome,
   IconArrowNarrowLeft,
-} from "@tabler/icons";
-import useMediaQueries from "@h/hooks/useMediaQueries";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import ClientLayoffForm from "@c/Layoff/ClientLayoffForm";
-import { useUser } from "@supabase/auth-helpers-react";
-import { User } from "@supabase/supabase-js";
-import RecentBar from "@c/Recent";
-import QSP from "@h/qsp";
-import dynamic from "next/dynamic";
+  IconBriefcase,
+} from '@tabler/icons';
+import useMediaQueries from '@h/hooks/useMediaQueries';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import ClientLayoffForm from '@c/Layoff/ClientLayoffForm';
+import RecentBar from '@c/Recent';
+import QSP from '@h/qsp';
+import dynamic from 'next/dynamic';
 import {
   InternalUserProvider,
   useInternalUser,
-  IInternalUserContext,
   IInternalUser,
-} from "@h/context/userContext";
+} from '@h/context/userContext';
+import AdminEdit from './AdminEdit';
 
 interface IProps extends PropsWithChildren<{}> {}
 
-const Chart = dynamic(() => import("@c/Chart/LayoffLineChart"), {
+const Chart = dynamic(() => import('@c/Chart/LayoffLineChart'), {
   ssr: false,
   loading: () => <Skeleton height="100%" width="100%" animate />,
 }) as any;
 
-const mobileBreakPoint = "sm";
+const mobileBreakPoint = 'sm';
 const Links = ({
   currentPath,
   user,
@@ -64,7 +63,7 @@ const Links = ({
             label="Home"
             icon={<IconHome size={16} />}
             description="my feed"
-            active={currentPath === "/"}
+            active={currentPath === '/'}
           />
         </Link>
         <Link href="/company" passHref>
@@ -72,7 +71,7 @@ const Links = ({
             label="Company"
             description="all companies"
             icon={<IconBrandApple size={16} />}
-            active={currentPath === "/company"}
+            active={currentPath === '/company'}
           />
         </Link>
         <Link href="/exec" passHref>
@@ -80,7 +79,14 @@ const Links = ({
             label="Executives"
             description="all executives"
             icon={<IconIdBadge size={16} />}
-            active={currentPath === "/exec"}
+            active={currentPath === '/exec'}
+          />
+        </Link>
+        <Link href="/position" passHref>
+          <NavLink
+            label="Positions"
+            icon={<IconBriefcase size={16} />}
+            active={currentPath === '/position'}
           />
         </Link>
         {user ? (
@@ -88,7 +94,7 @@ const Links = ({
             <NavLink
               label="My Account"
               icon={<IconUserCircle size={16} />}
-              active={currentPath === "/account"}
+              active={currentPath === '/account'}
             />
           </Link>
         ) : (
@@ -124,19 +130,19 @@ const Links = ({
         <ActionIcon
           variant="transparent"
           component="a"
-          disabled={currentPath === "/"}
+          disabled={currentPath === '/'}
         >
-          <IconHome color={currentPath === "/" ? "blue" : undefined} />
+          <IconHome color={currentPath === '/' ? 'blue' : undefined} />
         </ActionIcon>
       </Link>
       <Link href="/company" passHref>
         <ActionIcon
           variant="transparent"
           component="a"
-          disabled={currentPath === "/company"}
+          disabled={currentPath === '/company'}
         >
           <IconBrandApple
-            color={currentPath === "/company" ? "blue" : undefined}
+            color={currentPath === '/company' ? 'blue' : undefined}
           />
         </ActionIcon>
       </Link>
@@ -144,20 +150,20 @@ const Links = ({
         <ActionIcon
           variant="transparent"
           component="a"
-          disabled={currentPath === "/exec"}
+          disabled={currentPath === '/exec'}
         >
-          <IconIdBadge color={currentPath === "/exec" ? "blue" : undefined} />
+          <IconIdBadge color={currentPath === '/exec' ? 'blue' : undefined} />
         </ActionIcon>
       </Link>
-      <Link href={user ? "/account" : "/auth"} passHref>
+      <Link href={user ? '/account' : '/auth'} passHref>
         <ActionIcon variant="transparent" component="a">
           {user ? (
             <IconUserCircle
-              color={currentPath === "/account" ? "blue" : undefined}
+              color={currentPath === '/account' ? 'blue' : undefined}
             />
           ) : (
             <IconLockAccess
-              color={currentPath.includes("/auth") ? "blue" : undefined}
+              color={currentPath.includes('/auth') ? 'blue' : undefined}
             />
           )}
         </ActionIcon>
@@ -184,32 +190,52 @@ const MainLayout = ({ children }: IProps) => {
       navbarOffsetBreakpoint={mobileBreakPoint}
       navbar={
         <Navbar
-          p="md"
+          p="xs"
           hiddenBreakpoint={mobileBreakPoint}
           hidden={!opened}
-          width={{ sm: 200, lg: 300 }}
+          width={{ sm: 200, lg: 350 }}
+          height={`calc(100vh - 110px)`}
         >
-          <Links
-            currentPath={router.pathname}
-            user={user}
-            isLargerThanTable={media.isLargerThanTablet}
-          />
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              overflowY: 'auto',
+              padding: 5,
+              direction: 'rtl',
+              scrollbarWidth: 'thin',
+            }}
+          >
+            <div style={{ width: '100%', direction: 'ltr' }}>
+              <Links
+                currentPath={router.pathname}
+                user={user}
+                isLargerThanTable={media.isLargerThanTablet}
+              />
 
-          <div style={{ width: "100%", height: 300 }}>
-            <Chart showYTicks={media.isLargeDesktop} />
+              <div style={{ width: '100%', height: 300 }}>
+                <Chart showYTicks={media.isLargeDesktop} />
+              </div>
+              {media.isLargeDesktop && user?.isAdmin && (
+                <>
+                  {router.pathname.includes('/exec') && router.query.id && (
+                    <div style={{ margin: '10px auto', width: 150 }}>
+                      <Switch
+                        label="Edit mode"
+                        checked={isEditMode}
+                        onChange={(e) => setEdit(e.target.checked)}
+                      />
+                    </div>
+                  )}
+                  <AdminEdit router={router} />
+                </>
+              )}
+            </div>
           </div>
-
-          {media.isLargeDesktop && user?.isAdmin && (
-            <Switch
-              label="Edit mode"
-              checked={isEditMode}
-              onChange={(e) => setEdit(e.target.checked)}
-            />
-          )}
         </Navbar>
       }
       footer={
-        <MediaQuery largerThan={mobileBreakPoint} styles={{ display: "none" }}>
+        <MediaQuery largerThan={mobileBreakPoint} styles={{ display: 'none' }}>
           <Footer height={60} p="md">
             <Links
               currentPath={router.pathname}
@@ -223,9 +249,9 @@ const MainLayout = ({ children }: IProps) => {
         <Header height={110} p="md">
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              width: "100%",
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%',
               marginBottom: 5,
             }}
           >
@@ -259,10 +285,10 @@ const MainLayout = ({ children }: IProps) => {
     >
       {children}
       <Drawer
-        position={media.isLargerThanTablet ? "right" : "bottom"}
+        position={media.isLargerThanTablet ? 'right' : 'bottom'}
         opened={openReportLayoff}
         onClose={closeReportLayoff}
-        title={"Report a:"}
+        title={'Report a:'}
         padding="md"
         size="xl"
       >
@@ -302,7 +328,7 @@ const BackButton = ({
 
   if (
     isLargerThanTablet ||
-    ["/company", "/", "/exec", "/account"].includes(router.pathname)
+    ['/company', '/', '/exec', '/account'].includes(router.pathname)
   ) {
     return null;
   }

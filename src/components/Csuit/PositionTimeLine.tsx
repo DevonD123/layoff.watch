@@ -1,8 +1,31 @@
-import React, { useMemo } from "react";
-import { ThemeIcon, Text, Avatar, Timeline, Button, Card } from "@mantine/core";
-import moment from "moment";
-import { useLayoffsBetween } from "@c/Layoff/db";
-import { IconSnowflake, IconFlame, IconChartBar } from "@tabler/icons";
+import React, { useMemo } from 'react';
+import styled from '@emotion/styled';
+import {
+  ThemeIcon,
+  Text,
+  Avatar,
+  Timeline,
+  Button,
+  Card,
+  ActionIcon,
+} from '@mantine/core';
+import moment from 'moment';
+import { useLayoffsBetween } from '@c/Layoff/db';
+import {
+  IconSnowflake,
+  IconFlame,
+  IconChartBar,
+  IconEdit,
+} from '@tabler/icons';
+import { useInternalUser } from '@h/context/userContext';
+
+const ClickableEdit = styled(IconEdit)`
+  cursor: pointer;
+  transition: 300ms;
+  &:hover {
+    opacity: 0.7;
+  }
+`;
 
 type Props = { csuit_id: string; roles: any };
 
@@ -88,6 +111,7 @@ function getData(
 }
 
 const PositionTimeLine = (props: Props) => {
+  const { isEditMode } = useInternalUser();
   const companies = props.roles.map((x: any) => x.company_id);
   const orderedDates =
     props.roles && props.roles.length >= 1
@@ -105,15 +129,15 @@ const PositionTimeLine = (props: Props) => {
       ...x,
       ...getData(x.type, x.is_completed, x.number, x.percent, x.company?.name),
       start: x.layoff_date,
-      timeSpan: moment(x.layoff_date).format("M/d/yyyy"),
+      timeSpan: moment(x.layoff_date).format('M/d/yyyy'),
       company_id: x.company_id,
     }));
     const rolesMapped = (props.roles || []).map((x: any) => ({
       id: x.id,
       title: `Started as ${x.role} @ ${x.company.name}`,
       url: x.company.logo_url,
-      timeSpan: `${moment(x.start).format("M/d/yyyy")} ${x.end ? "-" : ""} ${
-        x.end ? moment(x.end).format("M/d/yyyy") : ""
+      timeSpan: `${moment(x.start).format('M/d/yyyy')} ${x.end ? '-' : ''} ${
+        x.end ? moment(x.end).format('M/d/yyyy') : ''
       }`,
       start: x.start,
       company_id: x.company_id,
@@ -121,7 +145,7 @@ const PositionTimeLine = (props: Props) => {
       companyName: x.company?.name,
     }));
 
-    let lastcompany_id = "";
+    let lastcompany_id = '';
     const sortedArr = [...layoffsMapped, ...rolesMapped]
       .sort(
         (a: any, b: any) =>
@@ -138,7 +162,7 @@ const PositionTimeLine = (props: Props) => {
       })
       .reverse();
 
-    return [{ id: "__NA__", title: "Current" }, ...sortedArr];
+    return [{ id: '__NA__', title: 'Current' }, ...sortedArr];
   }, [props.roles, data]);
 
   if (results.length <= 1) {
@@ -160,7 +184,21 @@ const PositionTimeLine = (props: Props) => {
           return (
             <Timeline.Item
               key={x.id}
-              title={x.title}
+              title={
+                isEditMode && x.id !== '__NA__' ? (
+                  <span>
+                    {x.title}{' '}
+                    <Text component="span" color="dimmed">
+                      <ClickableEdit
+                        onClick={() => alert('clicked')}
+                        size={14}
+                      />
+                    </Text>
+                  </span>
+                ) : (
+                  x.title
+                )
+              }
               bulletSize={x.url ? 30 : x.icon ? 18 : 10}
               bullet={
                 x.url ? <Avatar size={30} radius="xl" src={x.url} /> : x.icon
@@ -174,7 +212,7 @@ const PositionTimeLine = (props: Props) => {
                       &nbsp;-&nbsp;
                       <Text
                         size="sm"
-                        color={x.extraColor || "dimmed"}
+                        color={x.extraColor || 'dimmed'}
                         component="span"
                       >
                         {x.extra}
@@ -206,7 +244,7 @@ const Totals = ({ data }: { data: ITimelineData[] }) => {
         const mapVal = res[data[i].company_id];
         res[data[i].company_id] = {
           total: (mapVal?.total || 0) + (data[i].amount || 0),
-          name: mapVal?.name || data[i].companyName || "",
+          name: mapVal?.name || data[i].companyName || '',
         };
       }
     }
@@ -217,7 +255,7 @@ const Totals = ({ data }: { data: ITimelineData[] }) => {
     <Card
       sx={(theme) => ({
         width: 300,
-        margin: "10px auto 25px auto",
+        margin: '10px auto 25px auto',
         background: theme.colors.gray[2],
       })}
     >
@@ -228,7 +266,7 @@ const Totals = ({ data }: { data: ITimelineData[] }) => {
             color={getTextColorByCount(resultData[key].total)}
           >
             {resultData[key].total} layoffs
-          </Text>{" "}
+          </Text>{' '}
           @ {resultData[key].name} total
         </Text>
       ))}
@@ -238,15 +276,15 @@ const Totals = ({ data }: { data: ITimelineData[] }) => {
 
 function getTextColorByCount(count: number) {
   if (count === 0) {
-    return "green";
+    return 'green';
   }
   if (count <= 99) {
-    return "yellow";
+    return 'yellow';
   }
   if (count <= 499) {
-    return "orange";
+    return 'orange';
   }
-  return "red";
+  return 'red';
 }
 
 export default PositionTimeLine;

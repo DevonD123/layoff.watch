@@ -1,5 +1,5 @@
-import React, { PropsWithChildren } from "react";
-import Link from "next/link";
+import React, { PropsWithChildren } from 'react';
+import Link from 'next/link';
 import {
   Avatar,
   Text,
@@ -8,17 +8,19 @@ import {
   Group,
   Badge,
   Skeleton,
-} from "@mantine/core";
-import { IconChartBar, IconLink, IconSnowflake } from "@tabler/icons";
-import Card from "@c/Card/Card";
-import { useTopPipAndFreeze } from "./db";
-import { ReportType } from "@c/Layoff/types";
-import VerifiedBadge from "@c/Verified/VerifiedBadge";
+} from '@mantine/core';
+import { IconChartBar, IconLink, IconSnowflake } from '@tabler/icons';
+import Card from '@c/Card/Card';
+import { useTopPipAndFreeze } from './db';
+import { ReportType } from '@c/Layoff/types';
+import VerifiedBadge from '@c/Verified/VerifiedBadge';
+import getImage from '@h/getImage';
 
 interface Props extends PropsWithChildren<{}> {
   id: string;
   name: string;
   logo_url?: string;
+  uploaded_logo_key?: string;
   ticker?: string;
   description?: string;
   est_employee_count?: number;
@@ -37,9 +39,15 @@ export default function CompanySection({
   hasLink = true,
   verified,
   topRightComponent,
+  uploaded_logo_key,
   children,
 }: Props) {
   const { data, isLoading } = useTopPipAndFreeze(id);
+  const img_url = getImage({
+    url: uploaded_logo_key,
+    fallbackUrl: logo_url,
+    size: 20,
+  });
   const pipIndex =
     data &&
     data.length >= 1 &&
@@ -54,29 +62,29 @@ export default function CompanySection({
         {hasLink ? (
           <Link href={`/company/${id}`} passHref>
             <a>
-              <div style={{ position: "relative" }}>
+              <div style={{ position: 'relative' }}>
                 <Avatar
                   style={{ height: 150, width: 150 }}
-                  src={logo_url}
+                  src={img_url}
                   alt={name}
                 />
 
                 <IconLink
-                  style={{ position: "absolute", top: -10, left: -10 }}
+                  style={{ position: 'absolute', top: -10, left: -10 }}
                 />
               </div>
             </a>
           </Link>
         ) : (
-          <div style={{ position: "relative" }}>
+          <div style={{ position: 'relative' }}>
             <Avatar
               style={{ height: 150, width: 150 }}
-              src={logo_url}
+              src={img_url}
               alt={name}
             />
             <div
               style={{
-                position: "absolute",
+                position: 'absolute',
                 bottom: 2,
                 right: 2,
                 opacity: 0.7,
@@ -88,7 +96,7 @@ export default function CompanySection({
         )}
         <Bubble>
           <Text color="black" size="xl">
-            {name}{" "}
+            {name}{' '}
             {ticker && (
               <Text color="dimmed" size="md" component="span">
                 ({ticker})
@@ -119,20 +127,20 @@ export default function CompanySection({
                 size="lg"
                 radius="xl"
                 // color="orange"
-                color={pipIndex ? "orange" : "green"}
+                color={pipIndex ? 'orange' : 'green'}
                 pl={0}
                 leftSection={<IconChartBar size={15} />}
                 styles={{
                   leftSection: {
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   },
                 }}
               >
                 <span
                   style={{
-                    textTransform: "none",
+                    textTransform: 'none',
                   }}
                 >
                   {pipIndex
@@ -147,20 +155,20 @@ export default function CompanySection({
               <Badge
                 size="lg"
                 radius="xl"
-                color={freezeIndex ? "orange" : "green"}
+                color={freezeIndex ? 'orange' : 'green'}
                 pl={0}
                 styles={{
                   leftSection: {
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   },
                 }}
                 leftSection={<IconSnowflake size={15} />}
               >
                 <span
                   style={{
-                    textTransform: "none",
+                    textTransform: 'none',
                   }}
                 >
                   {freezeIndex ? `Hiring Freeze` : `Hiring`}
@@ -186,18 +194,18 @@ const ContentWrapper = ({
   return (
     <div
       style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        width: "100%",
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
       }}
     >
       <div
         style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'column',
           flexGrow: 5,
         }}
       >
@@ -215,7 +223,7 @@ const ContentWrapper = ({
 };
 
 export const Bubble = ({ children }: PropsWithChildren<{}>) => (
-  <BubbleInner px={"lg"} py={0}>
+  <BubbleInner px={'lg'} py={0}>
     {children}
   </BubbleInner>
 );
@@ -225,17 +233,17 @@ const BubbleInner = ({
   px,
   py,
 }: PropsWithChildren<{
-  px: "lg" | "xs" | "md" | "sm" | "lg" | 0;
-  py: "lg" | "xs" | "md" | "sm" | "lg" | 0;
+  px: 'lg' | 'xs' | 'md' | 'sm' | 'lg' | 0;
+  py: 'lg' | 'xs' | 'md' | 'sm' | 'lg' | 0;
 }>) => (
   <Box
     sx={(theme) => ({
       marginTop: theme.spacing.sm,
       backgroundColor: theme.colors.gray[0],
-      paddingTop: typeof py === "number" ? py : theme.spacing[py],
-      paddingBottom: typeof py === "number" ? py : theme.spacing[py],
-      paddingRight: typeof px === "number" ? px : theme.spacing[px],
-      paddingLeft: typeof px === "number" ? px : theme.spacing[px],
+      paddingTop: typeof py === 'number' ? py : theme.spacing[py],
+      paddingBottom: typeof py === 'number' ? py : theme.spacing[py],
+      paddingRight: typeof px === 'number' ? px : theme.spacing[px],
+      paddingLeft: typeof px === 'number' ? px : theme.spacing[px],
       borderRadius: theme.radius.lg,
     })}
   >

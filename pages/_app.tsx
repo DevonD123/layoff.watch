@@ -1,16 +1,16 @@
-import * as React from "react";
-import Head from "next/head";
-import { AppProps } from "next/app";
-import { CacheProvider, EmotionCache, useTheme } from "@emotion/react";
-import { UserProvider } from "@supabase/auth-helpers-react";
-import { supabaseClient } from "@supabase/auth-helpers-nextjs";
-import theme from "../src/helpers/theme";
-import createEmotionCache from "../src/helpers/createEmotionCache";
-import { ConcentProvider, didConcent } from "@h/cookieconcent";
-import { QueryClientProvider } from "@h/db/helper";
-import { MantineProvider, useMantineTheme } from "@mantine/core";
-import { NotificationsProvider } from "@mantine/notifications";
-import { ThemeProvider } from "@emotion/react";
+import * as React from 'react';
+import Head from 'next/head';
+import { AppProps } from 'next/app';
+import { CacheProvider, EmotionCache } from '@emotion/react';
+import { UserProvider } from '@supabase/auth-helpers-react';
+import { supabaseClient } from '@supabase/auth-helpers-nextjs';
+import theme from '../src/helpers/theme';
+import createEmotionCache from '../src/helpers/createEmotionCache';
+import { ConcentProvider, didConcent } from '@h/cookieconcent';
+import { QueryClientProvider } from '@h/db/helper';
+import { MantineProvider, useMantineTheme } from '@mantine/core';
+import { NotificationsProvider } from '@mantine/notifications';
+import { ThemeProvider } from '@emotion/react';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();

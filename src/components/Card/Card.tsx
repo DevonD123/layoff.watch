@@ -1,5 +1,5 @@
-import React, { PropsWithChildren } from "react";
-import { Card as MCard, Title } from "@mantine/core";
+import React, { PropsWithChildren } from 'react';
+import { Card as MCard, Title } from '@mantine/core';
 
 type Props = {
   isDark?: boolean;
@@ -19,14 +19,14 @@ function Card({
     <MCard
       sx={(theme) => ({
         minHeight: isSmall ? 50 : 200,
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         padding: theme.spacing.xl,
         background: isDark ? theme.colors.dark[5] : theme.colors.gray[2],
         color: isDark ? theme.colors.gray[2] : theme.colors.gray[8],
         borderRadius: theme.radius.xl,
-        position: "relative",
+        position: 'relative',
       })}
     >
       {title && (
@@ -36,6 +36,7 @@ function Card({
           sx={{
             marginTop: 0,
             marginRight: 15,
+            whiteSpace: 'nowrap',
           }}
         >
           {startIcon}
@@ -44,10 +45,10 @@ function Card({
       )}
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
           flexGrow: 1,
         }}
       >

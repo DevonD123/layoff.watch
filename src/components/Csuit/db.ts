@@ -5,7 +5,6 @@ import {
 } from "@h/db/helper";
 import showMsg from "@h/msg";
 import { supabase } from "@h/supabaseClient";
-import { v4 as uuidv4 } from "uuid";
 import { getRangeValues } from "@h/pghelper";
 import { ICSuitInput } from "./types";
 import uploadFile from "@h/uploadFile";

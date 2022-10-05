@@ -12,6 +12,7 @@ export const StyledListContainer = styled.div`
 
 export const StyledList = styled(List)`
   width: 100%;
+  list-style:none;
 `;
 export const StyledListItem = styled(List.Item, {
   shouldForwardProp: (pn: string) => pn !== "isLoading",

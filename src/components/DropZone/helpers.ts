@@ -68,7 +68,7 @@ export async function getCroppedImg(
         return resolve(new File([file], fileName || "file_upload", { type }));
       }
       return reject(null);
-    }, "image/jpeg");
+    }, "image/png");
   });
 }
 
