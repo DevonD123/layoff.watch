@@ -30,20 +30,22 @@ import { useRouter } from 'next/router';
 import ClientLayoffForm from '@c/Layoff/ClientLayoffForm';
 import RecentBar from '@c/Recent';
 import QSP from '@h/qsp';
-import dynamic from 'next/dynamic';
 import {
   InternalUserProvider,
   useInternalUser,
   IInternalUser,
 } from '@h/context/userContext';
-import AdminEdit from './AdminEdit';
+import dynamic from 'next/dynamic';
 
-interface IProps extends PropsWithChildren<{}> {}
-
+const DynamicAdminEdit = dynamic(() => import('./AdminEdit'), {
+  ssr: false,
+}) as any;
 const Chart = dynamic(() => import('@c/Chart/LayoffLineChart'), {
   ssr: false,
   loading: () => <Skeleton height="100%" width="100%" animate />,
 }) as any;
+
+interface IProps extends PropsWithChildren<{}> {}
 
 const mobileBreakPoint = 'sm';
 const Links = ({
@@ -175,7 +177,14 @@ const MainLayout = ({ children }: IProps) => {
   const media = useMediaQueries();
   const router = useRouter();
   const theme = useMantineTheme();
-  const { user, isLoading, isEditMode, setEdit } = useInternalUser();
+  const {
+    user,
+    isLoading,
+    isEditMode,
+    setEdit,
+    setSelectedCsuitRoleId,
+    selectedCsuitRoleId,
+  } = useInternalUser();
   const [openReportLayoff, setopenReportLayoff] = useState(false);
   const [opened, setOpened] = useState(false);
 
@@ -227,7 +236,7 @@ const MainLayout = ({ children }: IProps) => {
                       />
                     </div>
                   )}
-                  <AdminEdit router={router} />
+                  <DynamicAdminEdit />
                 </>
               )}
             </div>

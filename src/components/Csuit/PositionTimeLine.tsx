@@ -1,14 +1,6 @@
 import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
-import {
-  ThemeIcon,
-  Text,
-  Avatar,
-  Timeline,
-  Button,
-  Card,
-  ActionIcon,
-} from '@mantine/core';
+import { ThemeIcon, Text, Avatar, Timeline, Card } from '@mantine/core';
 import moment from 'moment';
 import { useLayoffsBetween } from '@c/Layoff/db';
 import {
@@ -18,6 +10,7 @@ import {
   IconEdit,
 } from '@tabler/icons';
 import { useInternalUser } from '@h/context/userContext';
+import constants from '@h/constants';
 
 const ClickableEdit = styled(IconEdit)`
   cursor: pointer;
@@ -111,7 +104,7 @@ function getData(
 }
 
 const PositionTimeLine = (props: Props) => {
-  const { isEditMode } = useInternalUser();
+  const { isEditMode, setSelectedCsuitRoleId } = useInternalUser();
   const companies = props.roles.map((x: any) => x.company_id);
   const orderedDates =
     props.roles && props.roles.length >= 1
@@ -129,16 +122,16 @@ const PositionTimeLine = (props: Props) => {
       ...x,
       ...getData(x.type, x.is_completed, x.number, x.percent, x.company?.name),
       start: x.layoff_date,
-      timeSpan: moment(x.layoff_date).format('M/d/yyyy'),
+      timeSpan: moment(x.layoff_date).format(constants.DATE_FORMAT),
       company_id: x.company_id,
     }));
     const rolesMapped = (props.roles || []).map((x: any) => ({
       id: x.id,
       title: `Started as ${x.role} @ ${x.company.name}`,
       url: x.company.logo_url,
-      timeSpan: `${moment(x.start).format('M/d/yyyy')} ${x.end ? '-' : ''} ${
-        x.end ? moment(x.end).format('M/d/yyyy') : ''
-      }`,
+      timeSpan: `${moment(x.start).format(constants.DATE_FORMAT)} ${
+        x.end ? '-' : ''
+      } ${x.end ? moment(x.end).format(constants.DATE_FORMAT) : ''}`,
       start: x.start,
       company_id: x.company_id,
       isPosition: true,
@@ -190,7 +183,7 @@ const PositionTimeLine = (props: Props) => {
                     {x.title}{' '}
                     <Text component="span" color="dimmed">
                       <ClickableEdit
-                        onClick={() => alert('clicked')}
+                        onClick={() => setSelectedCsuitRoleId(x.id)}
                         size={14}
                       />
                     </Text>

@@ -1,11 +1,12 @@
-import React from "react";
-import Card from "@c/Card/Card";
-import { Text, Grid, ActionIcon } from "@mantine/core";
-import { IconLink, IconSnowflake } from "@tabler/icons";
-import Link from "next/link";
-import { useFreezeReports } from "./db";
-import moment from "moment";
-import getCompltedStatusIcon from "@h/getCompletedStatusIcon";
+import React from 'react';
+import Card from '@c/Card/Card';
+import { Text, Grid, ActionIcon } from '@mantine/core';
+import { IconLink, IconSnowflake } from '@tabler/icons';
+import Link from 'next/link';
+import { useFreezeReports } from './db';
+import moment from 'moment';
+import getCompltedStatusIcon from '@h/getCompletedStatusIcon';
+import constants from '@h/constants';
 
 type Props = { company_id: string };
 
@@ -28,7 +29,7 @@ function FreezeCard({ company_id }: Props) {
             key={report.id}
             sx={(theme) => ({
               borderBottom: `1px solid ${theme.colors.gray[4]}`,
-              width: "100%",
+              width: '100%',
             })}
             mb={5}
           >
@@ -36,9 +37,9 @@ function FreezeCard({ company_id }: Props) {
               <Text
                 size="lg"
                 style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}
                 title={report.title}
               >
@@ -49,9 +50,9 @@ function FreezeCard({ company_id }: Props) {
             <Grid.Col span={8} pt={0}>
               <Text color="dimmed" align="left">
                 {report.is_completed
-                  ? "Hiring started @ "
-                  : "Hiring stopped @ "}
-                {moment(report.layoff_date).format("M/d/yyyy")}
+                  ? 'Hiring started @ '
+                  : 'Hiring stopped @ '}
+                {moment(report.layoff_date).format(constants.DATE_FORMAT)}
               </Text>
             </Grid.Col>
             <Grid.Col span={4} pt={0}>
@@ -61,7 +62,7 @@ function FreezeCard({ company_id }: Props) {
                   variant="light"
                   color="blue"
                   size="sm"
-                  style={{ marginLeft: "auto", marginRight: 0 }}
+                  style={{ marginLeft: 'auto', marginRight: 0 }}
                 >
                   <IconLink />
                 </ActionIcon>

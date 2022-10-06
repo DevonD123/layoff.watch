@@ -11,6 +11,7 @@ import {
 import moment from 'moment';
 import { ReportType } from './types';
 import List, { ListItem, LoadingListItem, AvatarWrapper } from '@c/List';
+import constants from '@h/constants';
 
 type Props = {
   fetchPg?: (obj: { pageParam?: number }) => Promise<IPageData>;
@@ -141,7 +142,7 @@ const Feed = ({ fetchPg, cacheKey = 'layoff_feed', cacheObj = {} }: Props) => {
         }
         rightTop={text.number || undefined}
         rightBottom={`Affective ${moment(report.layoff_date).format(
-          'M/d/yyyy'
+          constants.DATE_FORMAT
         )}`}
         link={`/report/${report.id}`}
       />

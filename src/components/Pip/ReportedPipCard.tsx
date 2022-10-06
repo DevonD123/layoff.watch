@@ -1,11 +1,12 @@
-import React from "react";
-import Card from "@c/Card/Card";
-import { Text, Grid, ActionIcon } from "@mantine/core";
-import { IconLink, IconChartBar } from "@tabler/icons";
-import Link from "next/link";
-import { usePipReports } from "./db";
-import moment from "moment";
-import getCompltedStatusIcon from "@h/getCompletedStatusIcon";
+import React from 'react';
+import Card from '@c/Card/Card';
+import { Text, Grid, ActionIcon } from '@mantine/core';
+import { IconLink, IconChartBar } from '@tabler/icons';
+import Link from 'next/link';
+import { usePipReports } from './db';
+import moment from 'moment';
+import getCompltedStatusIcon from '@h/getCompletedStatusIcon';
+import constants from '@h/constants';
 
 type Props = { company_id: string };
 
@@ -29,7 +30,7 @@ function ReportedPipCard({ company_id }: Props) {
             key={report.id}
             sx={(theme) => ({
               borderBottom: `1px solid ${theme.colors.gray[8]}`,
-              width: "100%",
+              width: '100%',
             })}
             mb={5}
           >
@@ -46,9 +47,9 @@ function ReportedPipCard({ company_id }: Props) {
               )}
             </Grid.Col>
             <Grid.Col span={5} pt={0}>
-              <Text color="dimmed" align={"right"}>
-                {report.is_completed ? "End " : "Start "}
-                {moment(report.layoff_date).format("M/d/yyyy")}
+              <Text color="dimmed" align={'right'}>
+                {report.is_completed ? 'End ' : 'Start '}
+                {moment(report.layoff_date).format(constants.DATE_FORMAT)}
               </Text>
             </Grid.Col>
             <Grid.Col span={2} pt={0}>

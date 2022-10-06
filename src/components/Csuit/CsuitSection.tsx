@@ -1,8 +1,9 @@
-import React from "react";
-import { Avatar, Text, Box, Grid } from "@mantine/core";
-import Link from "next/link";
-import { IconLink } from "@tabler/icons";
-import moment from "moment";
+import React from 'react';
+import { Avatar, Text, Box, Grid } from '@mantine/core';
+import Link from 'next/link';
+import { IconLink } from '@tabler/icons';
+import moment from 'moment';
+import constants from '@h/constants';
 
 interface Props {
   id: string;
@@ -32,19 +33,19 @@ function CsuitSection({
   hasLink = true,
 }: Props) {
   return (
-    <Grid style={{ width: "100%", marginTop: 5 }}>
+    <Grid style={{ width: '100%', marginTop: 5 }}>
       <Grid.Col span={4}>
         {hasLink ? (
           <Link href={`/exec/${id}`} passHref>
             <a>
-              <div style={{ position: "relative" }}>
+              <div style={{ position: 'relative' }}>
                 <Avatar
                   src={getAvatarUrl(img_url)}
                   alt={name}
                   style={{ height: 50, width: 50 }}
                   radius="xl"
                 />
-                <IconLink style={{ position: "absolute", top: -5, left: -5 }} />
+                <IconLink style={{ position: 'absolute', top: -5, left: -5 }} />
               </div>
             </a>
           </Link>
@@ -59,7 +60,7 @@ function CsuitSection({
       </Grid.Col>
       <Grid.Col span={8}>
         <Text size="lg">
-          {name}{" "}
+          {name}{' '}
           {role && (
             <Text size="md" color="dimmed" component="span">
               ({role})
@@ -68,8 +69,8 @@ function CsuitSection({
         </Text>
         {start && (
           <Text size="md" color="dimmed">
-            {moment(start).format("M/d/yyyy")} to{" "}
-            {end ? moment(end).format("M/d/yyyy") : "Current"}
+            {moment(start).format(constants.DATE_FORMAT)} to{' '}
+            {end ? moment(end).format(constants.DATE_FORMAT) : 'Current'}
           </Text>
         )}
       </Grid.Col>

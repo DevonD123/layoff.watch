@@ -9,7 +9,12 @@ import {
   Badge,
   Skeleton,
 } from '@mantine/core';
-import { IconChartBar, IconLink, IconSnowflake } from '@tabler/icons';
+import {
+  IconBuilding,
+  IconChartBar,
+  IconLink,
+  IconSnowflake,
+} from '@tabler/icons';
 import Card from '@c/Card/Card';
 import { useTopPipAndFreeze } from './db';
 import { ReportType } from '@c/Layoff/types';
@@ -46,7 +51,7 @@ export default function CompanySection({
   const img_url = getImage({
     url: uploaded_logo_key,
     fallbackUrl: logo_url,
-    size: 20,
+    size: 150,
   });
   const pipIndex =
     data &&
@@ -67,7 +72,9 @@ export default function CompanySection({
                   style={{ height: 150, width: 150 }}
                   src={img_url}
                   alt={name}
-                />
+                >
+                  <IconBuilding size={150} />
+                </Avatar>
 
                 <IconLink
                   style={{ position: 'absolute', top: -10, left: -10 }}
@@ -81,7 +88,9 @@ export default function CompanySection({
               style={{ height: 150, width: 150 }}
               src={img_url}
               alt={name}
-            />
+            >
+              <IconBuilding size={150} />
+            </Avatar>
             <div
               style={{
                 position: 'absolute',

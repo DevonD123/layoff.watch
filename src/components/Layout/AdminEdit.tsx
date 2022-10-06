@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NextRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import {
   Button,
   Modal,
@@ -7,16 +7,20 @@ import {
   Stack,
   TextInput,
   Textarea,
+  Switch,
+  Checkbox,
 } from '@mantine/core';
 import DropZone from '@c/DropZone/DropZone';
 import showMsg from '@h/msg';
 import { supabaseClient } from '@supabase/auth-helpers-nextjs';
 import uploadFile from '@h/uploadFile';
 import validate, { isInvalid } from '@h/api/validation';
+import { getCommaSeperatedText } from '@c/Company/helper';
+import { useInternalUser } from '@h/context/userContext';
+import { DatePicker } from '@mantine/dates';
+import RoleSelect from '@c/Csuit/RoleSelect';
+import moment from 'moment';
 
-interface IAdminEditProps {
-  router: NextRouter;
-}
 export enum RouteName {
   Company = 'company',
   Exec = 'exec',
@@ -33,8 +37,9 @@ export const routeMap = {
   [RouteName.ExecRole]: { tbl: 'csuit_role', name: 'exec role' },
 };
 
-const AdminEdit: React.FunctionComponent<IAdminEditProps> = ({ router }) => {
-  const [open, setOpen] = useState(false);
+const AdminEdit: React.FunctionComponent = () => {
+  const router = useRouter();
+  const { selectedCsuitRoleId, setSelectedCsuitRoleId } = useInternalUser();
   const id = router.query.id as string;
   if (!id) {
     return <></>;
@@ -54,6 +59,14 @@ const AdminEdit: React.FunctionComponent<IAdminEditProps> = ({ router }) => {
         <VerifyButton mapKey={RouteName.Exec} id={id} />
         <SwapPicture mapKey={RouteName.Exec} id={id} />
         <EditButton mapKey={RouteName.Exec} id={id} />
+        {selectedCsuitRoleId && (
+          <EditButton
+            mapKey={RouteName.ExecRole}
+            id={selectedCsuitRoleId}
+            idFromContext
+            setCsuitRoleId={setSelectedCsuitRoleId}
+          />
+        )}
       </>
     );
   }
@@ -299,9 +312,20 @@ const SwapPicture = ({ mapKey, id }: { mapKey: RouteName; id: string }) => {
   );
 };
 
-const EditButton = ({ mapKey, id }: { mapKey: RouteName; id: string }) => {
+const EditButton = ({
+  mapKey,
+  id,
+  idFromContext,
+  setCsuitRoleId,
+}: {
+  mapKey: RouteName;
+  id: string;
+  idFromContext?: boolean;
+  setCsuitRoleId?: (newId?: string) => void;
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [showEnd, setShowEnd] = useState(false);
   const [data, setData] = useState<any>({});
 
   const onVerifyClicked = async () => {
@@ -320,6 +344,9 @@ const EditButton = ({ mapKey, id }: { mapKey: RouteName; id: string }) => {
       const json = await fetched.json();
       if (!isError) {
         setOpen(false);
+        if (idFromContext && setCsuitRoleId) {
+          setCsuitRoleId(undefined);
+        }
       }
       showMsg(json.msg, isError ? 'error' : 'success');
     } catch (e) {
@@ -330,15 +357,18 @@ const EditButton = ({ mapKey, id }: { mapKey: RouteName; id: string }) => {
     }
   };
   const closeDialog = () => {
+    if (setCsuitRoleId && idFromContext) {
+      setCsuitRoleId(undefined);
+    }
     setOpen(false);
     setData({});
   };
 
-  const handleOpen = async () => {
+  const handleOpen = React.useCallback(async () => {
     setIsLoading(true);
     const { data: resData, error } = await supabaseClient
       .from(routeMap[mapKey].tbl)
-      .select()
+      .select(mapKey === RouteName.ExecRole ? '*,company(name)' : '*')
       .eq('id', id)
       .maybeSingle();
     if (!resData || error) {
@@ -346,20 +376,44 @@ const EditButton = ({ mapKey, id }: { mapKey: RouteName; id: string }) => {
       showMsg('Error finding items');
       return setIsLoading(false);
     }
-    setData(resData);
+    if (mapKey === RouteName.Company && resData.est_employee_count) {
+      setData({
+        ...resData,
+        est_employee_count: getCommaSeperatedText(
+          '' + resData.est_employee_count
+        ),
+      });
+    } else {
+      if (mapKey === RouteName.ExecRole) {
+        setShowEnd(!!resData.end);
+        resData.start = moment(resData.start).toDate();
+        if (resData.end) {
+          resData.end = moment(resData.end).toDate();
+        }
+      }
+      setData(resData);
+    }
     setIsLoading(false);
     setOpen(true);
-  };
+  }, [id, mapKey]);
+  React.useEffect(() => {
+    if (idFromContext && id && mapKey === RouteName.ExecRole) {
+      handleOpen();
+      setOpen(true);
+    }
+  }, [idFromContext, id, mapKey, handleOpen]);
   return (
     <>
-      <Button
-        color="green"
-        style={{ margin: '5px auto' }}
-        onClick={handleOpen}
-        fullWidth
-      >
-        Update {routeMap[mapKey]?.name}
-      </Button>
+      {!idFromContext && (
+        <Button
+          color="green"
+          style={{ margin: '5px auto' }}
+          onClick={handleOpen}
+          fullWidth
+        >
+          Update {routeMap[mapKey]?.name}
+        </Button>
+      )}
       <Modal
         centered
         opened={open}
@@ -377,7 +431,7 @@ const EditButton = ({ mapKey, id }: { mapKey: RouteName; id: string }) => {
                 onChange={(e) => {
                   setData({
                     ...data,
-                    name: e.target.value.trim(),
+                    name: e.target.value,
                   });
                 }}
               />
@@ -401,11 +455,148 @@ const EditButton = ({ mapKey, id }: { mapKey: RouteName; id: string }) => {
                 onChange={(e) => {
                   setData({
                     ...data,
-                    description: e.target.value.trim(),
+                    description: e.target.value,
                   });
                 }}
               />
             </>
+          )}
+          {mapKey === RouteName.Company && (
+            <>
+              <TextInput
+                label="Name"
+                placeholder="Microsoft"
+                required
+                value={data.name}
+                onChange={(e) => {
+                  const name = e.target.value
+                    ? e.target.value[0].toUpperCase() + e.target.value.slice(1)
+                    : null;
+                  setData({
+                    ...data,
+                    name,
+                  });
+                }}
+              />
+              <TextInput
+                label="Ticker"
+                placeholder="MSFT"
+                value={data.ticker}
+                onChange={(e) => {
+                  setData({
+                    ...data,
+                    ticker: e.target.value.toUpperCase().trim(),
+                  });
+                }}
+              />
+              <Textarea
+                label="Description"
+                rows={3}
+                placeholder="they do xyz."
+                value={data.description}
+                onChange={(e) => {
+                  setData({
+                    ...data,
+                    description: e.target.value,
+                  });
+                }}
+              />
+              <TextInput
+                value={data.est_employee_count || ''}
+                onChange={(e) => {
+                  setData({
+                    ...data,
+                    est_employee_count: e.target.value
+                      ? getCommaSeperatedText(e.target.value)
+                      : '',
+                  });
+                }}
+                label="Estimated Employees"
+                placeholder="221,000"
+              />
+            </>
+          )}
+          {mapKey === RouteName.Exec && (
+            <>
+              <TextInput
+                label="Name"
+                placeholder="John Doe"
+                description="first & last"
+                required
+                value={data.name}
+                onChange={(e) => {
+                  const nameChunks = (e.target.value || '').split(' ');
+                  for (let i = 0; i < nameChunks.length; i++) {
+                    if (nameChunks[i] && nameChunks[i].length >= 1) {
+                      nameChunks[i] =
+                        nameChunks[i][0].toUpperCase() + nameChunks[i].slice(1);
+                    }
+                  }
+                  setData({
+                    ...data,
+                    name: nameChunks.join(' '),
+                  });
+                }}
+              />
+              <Textarea
+                label="Bio"
+                rows={3}
+                placeholder="former exec at enron"
+                value={data.bio}
+                onChange={(e) => {
+                  setData({
+                    ...data,
+                    bio: e.target.value,
+                  });
+                }}
+              />
+            </>
+          )}
+          {mapKey === RouteName.ExecRole && (
+            <>
+              <DatePicker
+                label="Start"
+                required
+                value={data.start}
+                onChange={(newDate) => setData({ ...data, start: newDate })}
+              />
+              <Checkbox
+                label={`Currently working @ ${data?.company?.name}`}
+                checked={!showEnd}
+                onChange={(e) => {
+                  if (!e.target.checked) {
+                    const end = moment(data.start ? data.start : undefined)
+                      .add(365, 'days')
+                      .toDate();
+                    setData({ ...data, end });
+                  } else {
+                    setData({ ...data, end: null });
+                  }
+                  setShowEnd(!e.target.checked);
+                }}
+              />
+              {showEnd && (
+                <DatePicker
+                  label="End"
+                  required
+                  value={data.end}
+                  onChange={(newDate) => setData({ ...data, end: newDate })}
+                />
+              )}
+              <RoleSelect
+                label="Role"
+                role={data.role}
+                required
+                setRole={(role) => setData({ ...data, role })}
+              />
+            </>
+          )}
+          {mapKey !== RouteName.Position && (
+            <Switch
+              checked={data.verified}
+              label="Verified"
+              onChange={(e) => setData({ ...data, verified: e.target.checked })}
+            />
           )}
         </Stack>
         <Group style={{ marginTop: 15 }} position="right">
@@ -416,7 +607,7 @@ const EditButton = ({ mapKey, id }: { mapKey: RouteName; id: string }) => {
             color={'green'}
             onClick={onVerifyClicked}
             loading={isLoading}
-            disabled={isInvalid(validate(mapKey, data))}
+            disabled={!open || !data || isInvalid(validate(mapKey, data))}
           >
             Update
           </Button>

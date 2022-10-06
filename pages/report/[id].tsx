@@ -1,23 +1,24 @@
-import React, { useEffect } from "react";
-import type { NextPage } from "next";
-import MainLayout from "@c/Layout";
-import { Skeleton, Text, Title, Anchor } from "@mantine/core";
-import { useRouter } from "next/router";
-import { useLayoffPgData } from "@c/Layoff/db";
-import { IconExternalLink, IconInfoCircle } from "@tabler/icons";
-import Link from "next/link";
-import PositionDisplayLinkList from "@c/Position/PositionDisplayLinkList";
-import CompanySection from "@c/Company/CompanySection";
-import CsuitSection from "@c/Csuit/CsuitSection";
-import Head from "next/head";
-import moment from "moment";
-import ReportButton from "@c/ReportButton/ReportButton";
-import MoreInfoButton from "@c/MoreInfoButton/MoreInfoButton";
-import CompanyLayoffHistoryLineChart from "@c/Chart/CompanyLayoffHistoryLineChart";
-import { ReportType } from "@c/Layoff/types";
-import getCompltedStatusIcon from "@h/getCompletedStatusIcon";
-import VerifiedBadge from "@c/Verified/VerifiedBadge";
-import useMediaQueries from "@h/hooks/useMediaQueries";
+import React, { useEffect } from 'react';
+import type { NextPage } from 'next';
+import MainLayout from '@c/Layout';
+import { Skeleton, Text, Title, Anchor } from '@mantine/core';
+import { useRouter } from 'next/router';
+import { useLayoffPgData } from '@c/Layoff/db';
+import { IconExternalLink, IconInfoCircle } from '@tabler/icons';
+import Link from 'next/link';
+import PositionDisplayLinkList from '@c/Position/PositionDisplayLinkList';
+import CompanySection from '@c/Company/CompanySection';
+import CsuitSection from '@c/Csuit/CsuitSection';
+import Head from 'next/head';
+import moment from 'moment';
+import ReportButton from '@c/ReportButton/ReportButton';
+import MoreInfoButton from '@c/MoreInfoButton/MoreInfoButton';
+import CompanyLayoffHistoryLineChart from '@c/Chart/CompanyLayoffHistoryLineChart';
+import { ReportType } from '@c/Layoff/types';
+import getCompltedStatusIcon from '@h/getCompletedStatusIcon';
+import VerifiedBadge from '@c/Verified/VerifiedBadge';
+import useMediaQueries from '@h/hooks/useMediaQueries';
+import constants from '@h/constants';
 
 const Home: NextPage = () => {
   const { isLargerThanTablet } = useMediaQueries();
@@ -28,7 +29,7 @@ const Home: NextPage = () => {
     <MainLayout>
       <Head>
         <title>
-          Layoff watch | {isLoading ? "Company" : data.company.name} layoffs
+          Layoff watch | {isLoading ? 'Company' : data.company.name} layoffs
           reported
         </title>
       </Head>
@@ -56,10 +57,10 @@ const Home: NextPage = () => {
         <Skeleton />
       ) : !data.extra_info ? null : (
         <Text>
-          In affect {moment(data.layoff_date).startOf("day").fromNow()}
+          In affect {moment(data.layoff_date).startOf('day').fromNow()}
           <Text color="dimmed" component="span">
-            {" "}
-            ({moment(data.layoff_date).format("M/d/yyyy")})
+            {' '}
+            ({moment(data.layoff_date).format(constants.DATE_FORMAT)})
           </Text>
         </Text>
       )}
@@ -67,8 +68,8 @@ const Home: NextPage = () => {
         <Skeleton />
       ) : (
         <Text size="md" color="dimmed">
-          Affected positions:{" "}
-          {!isLoading && data.position_layoff.length <= 0 && "None reported"}
+          Affected positions:{' '}
+          {!isLoading && data.position_layoff.length <= 0 && 'None reported'}
         </Text>
       )}
       {isLoading ? (
@@ -157,7 +158,7 @@ const ReportTypeTile = ({
         {number} Employees Laid off
         {percent && (
           <Text color="dimmed" size="sm" component="span">
-            {" "}
+            {' '}
             ({percent}% of workforce)
           </Text>
         )}
@@ -168,11 +169,11 @@ const ReportTypeTile = ({
   if (type === ReportType.Pip) {
     return (
       <div>
-        <Text size="xl" color={is_completed ? "green" : "orange"}>
+        <Text size="xl" color={is_completed ? 'green' : 'orange'}>
           {getCompltedStatusIcon(is_completed)}
-          PIP{" "}
+          PIP{' '}
           {is_completed
-            ? "removed!"
+            ? 'removed!'
             : `introduced with a target of ${percent}%`}
         </Text>
         {
@@ -187,9 +188,9 @@ const ReportTypeTile = ({
   if (type === ReportType.Freeze) {
     return (
       <div>
-        <Text size="xl" color={is_completed ? "green" : "orange"}>
+        <Text size="xl" color={is_completed ? 'green' : 'orange'}>
           {getCompltedStatusIcon(is_completed)}
-          {is_completed ? "Hiring started!" : `Hiring freeze started.`}
+          {is_completed ? 'Hiring started!' : `Hiring freeze started.`}
         </Text>
 
         {false /* TODO */ && (

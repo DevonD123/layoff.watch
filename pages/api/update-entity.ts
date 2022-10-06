@@ -72,7 +72,7 @@ export function mapBody(table: RouteName, body:any,isAdmin?:boolean,isAdd?:boole
         result.name = upperFirstChar(body.name)
         result = addIfNotUndefined(result,'ticker',body.ticker)
         result = addIfNotUndefined(result,'description',body.description)
-        result = addIfNotUndefined(result,'est_employee_count',body.est_employee_count)
+        result = addIfNotUndefined(result,'est_employee_count',stripCommasFromNumber(body.est_employee_count))
         if(result.ticker){
             result.ticker = result.ticker.toUpperCase().trim()
         }
@@ -138,6 +138,17 @@ const addIfNotUndefined = (result:any,key:string,value:any) => {
         return result
     }
     return {...result,[key]:value}
+}
+
+const stripCommasFromNumber = (val?: string|number|null) => {
+    if(typeof val === 'string'){
+        const res =  parseInt(val.replaceAll(',',''))
+        if(isNaN(res)){
+            return null
+        }
+        return res
+    }
+    return val
 }
 
 const upperFirstChar = (str:string) => {
