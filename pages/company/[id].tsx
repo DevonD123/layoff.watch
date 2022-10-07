@@ -1,21 +1,22 @@
-import React, { useMemo, useState } from "react";
-import type { NextPage } from "next";
-import MainLayout, { TwoColStack } from "@c/Layout";
-import { Skeleton, Text, Collapse, Anchor } from "@mantine/core";
-import { IconArrowDownCircle, IconId } from "@tabler/icons";
-import { useRouter } from "next/router";
-import { useCompanyById } from "@c/Company/db";
-import Head from "next/head";
-import ReportButton from "@c/ReportButton/ReportButton";
-import MoreInfoButton from "@c/MoreInfoButton/MoreInfoButton";
-import CompanySection from "@c/Company/CompanySection";
-import CompanyLayoffHistoryLineChart from "@c/Chart/CompanyLayoffHistoryLineChart";
-import Card from "@c/Card/Card";
-import CsuitSection from "@c/Csuit/CsuitSection";
-import SubCard from "@c/Subsidiaries/SubCard";
-import ReportedPipCard from "@c/Pip/ReportedPipCard";
-import FreezeCard from "@c/Freeze/FreezeCard";
-import useMediaQueries from "@h/hooks/useMediaQueries";
+import React, { useMemo, useState } from 'react';
+import type { NextPage } from 'next';
+import MainLayout, { TwoColStack } from '@c/Layout';
+import { Skeleton, Text, Collapse, Anchor } from '@mantine/core';
+import { IconArrowDownCircle, IconId } from '@tabler/icons';
+import { useRouter } from 'next/router';
+import { useCompanyById } from '@c/Company/db';
+import Head from 'next/head';
+import ReportButton from '@c/ReportButton/ReportButton';
+import MoreInfoButton from '@c/MoreInfoButton/MoreInfoButton';
+import CompanySection from '@c/Company/CompanySection';
+import CompanyLayoffHistoryLineChart from '@c/Chart/CompanyLayoffHistoryLineChart';
+import Card from '@c/Card/Card';
+import CsuitSection from '@c/Csuit/CsuitSection';
+import SubCard from '@c/Subsidiaries/SubCard';
+import ReportedPipCard from '@c/Pip/ReportedPipCard';
+import FreezeCard from '@c/Freeze/FreezeCard';
+import useMediaQueries from '@h/hooks/useMediaQueries';
+import constants from '@h/constants';
 
 const CompanyPg: NextPage = () => {
   const router = useRouter();
@@ -26,7 +27,7 @@ const CompanyPg: NextPage = () => {
     <MainLayout>
       <Head>
         <title>
-          Layoff watch | {isLoading ? "Company" : company.name} Info
+          {constants.SITE_NAME} | {isLoading ? 'Company' : company.name} Info
         </title>
       </Head>
       {isLoading ? (
@@ -121,10 +122,10 @@ const ExecCard = ({ csuit_role }: { csuit_role?: any[] }) => {
     <Card
       title={
         res.current.length >= 1
-          ? "Current Execs"
+          ? 'Current Execs'
           : res.past.length >= 1
-          ? "Past Execs"
-          : "Company Execs"
+          ? 'Past Execs'
+          : 'Company Execs'
       }
     >
       {res.current.map((csuit: any) => (
@@ -133,7 +134,7 @@ const ExecCard = ({ csuit_role }: { csuit_role?: any[] }) => {
       {res.past.length >= 1 && res.current.length >= 1 && (
         <Text
           size="xl"
-          style={{ alignSelf: "baseline", marginTop: 12 }}
+          style={{ alignSelf: 'baseline', marginTop: 12 }}
           color="dimmed"
         >
           Past Execs
@@ -141,7 +142,7 @@ const ExecCard = ({ csuit_role }: { csuit_role?: any[] }) => {
       )}
       <Collapse
         in={res.current.length <= 0 || open}
-        style={{ width: "100%", paddingLeft: 5 }}
+        style={{ width: '100%', paddingLeft: 5 }}
       >
         {res.past.map((csuit: any) => (
           <CsuitSection key={csuit.id} {...csuit} />

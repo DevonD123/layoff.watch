@@ -8,9 +8,13 @@ import {
   IconFlame,
   IconChartBar,
   IconEdit,
+  IconCoin,
 } from '@tabler/icons';
 import { useInternalUser } from '@h/context/userContext';
 import constants from '@h/constants';
+import VerifiedBadge from '@c/Verified/VerifiedBadge';
+import getImage from '@h/getImage';
+import Company from 'pages/admin/company';
 
 const ClickableEdit = styled(IconEdit)`
   cursor: pointer;
@@ -20,7 +24,7 @@ const ClickableEdit = styled(IconEdit)`
   }
 `;
 
-type Props = { csuit_id: string; roles: any };
+type Props = { csuit_id: string; roles: any; bonusArr: any[] };
 
 interface ITimelineData {
   id: string;
@@ -112,23 +116,28 @@ const PositionTimeLine = (props: Props) => {
           Date.parse(a.start) > Date.parse(b.start) ? b.start : a.start
         )
       : [];
-  //   const finalDate =
-  //     orderedDates.length >= 1 && orderedDates[0].start
-  //       ? orderedDates[0].start
-  //       : null;
   const { data } = useLayoffsBetween(orderedDates?.start, companies);
   const results: ITimelineData[] = useMemo(() => {
+    const formatter = new Intl.NumberFormat(`en-US`, {
+      currency: `USD`,
+      style: 'currency',
+    });
     const layoffsMapped = (data || []).map((x: any) => ({
       ...x,
       ...getData(x.type, x.is_completed, x.number, x.percent, x.company?.name),
       start: x.layoff_date,
       timeSpan: moment(x.layoff_date).format(constants.DATE_FORMAT),
       company_id: x.company_id,
+      verified: x.verified,
     }));
     const rolesMapped = (props.roles || []).map((x: any) => ({
       id: x.id,
       title: `Started as ${x.role} @ ${x.company.name}`,
-      url: x.company.logo_url,
+      url: getImage({
+        url: x.company.uploaded_logo_key,
+        fallbackUrl: x.company.logo_url,
+        size: 30,
+      }),
       timeSpan: `${moment(x.start).format(constants.DATE_FORMAT)} ${
         x.end ? '-' : ''
       } ${x.end ? moment(x.end).format(constants.DATE_FORMAT) : ''}`,
@@ -136,16 +145,31 @@ const PositionTimeLine = (props: Props) => {
       company_id: x.company_id,
       isPosition: true,
       companyName: x.company?.name,
+      verified: x.verified,
+    }));
+    const bonusMapped = (props.bonusArr || []).map((x: any) => ({
+      id: x.id,
+      title: `${
+        formatter.format(x.amount).split('.')[0]
+      } USD recived on ${moment(x.start).format(constants.DATE_FORMAT)} from ${
+        x.company?.name
+      }`,
+      isBonus: true,
+      start: x.date,
+      verified: x.verified,
     }));
 
     let lastcompany_id = '';
-    const sortedArr = [...layoffsMapped, ...rolesMapped]
+    const sortedArr = [...layoffsMapped, ...rolesMapped, ...bonusMapped]
       .sort(
         (a: any, b: any) =>
           new Date(b.start).getTime() - new Date(a.start).getTime()
       )
       .reverse()
       .filter((x) => {
+        if (x.isBonus) {
+          return true;
+        }
         if (x.isPosition) {
           lastcompany_id = x.company_id;
           return true;
@@ -156,7 +180,7 @@ const PositionTimeLine = (props: Props) => {
       .reverse();
 
     return [{ id: '__NA__', title: 'Current' }, ...sortedArr];
-  }, [props.roles, data]);
+  }, [props.roles, data, props.bonusArr]);
 
   if (results.length <= 1) {
     return (
@@ -172,25 +196,49 @@ const PositionTimeLine = (props: Props) => {
 
   return (
     <>
-      <Timeline style={{ marginTop: 25, marginBottom: 25 }}>
+      <Timeline style={{ margin: '25px auto', maxWidth: 500 }}>
         {results.map((x: any) => {
-          return (
-            <Timeline.Item
-              key={x.id}
-              title={
-                isEditMode && x.id !== '__NA__' ? (
-                  <span>
+          if (x.isBonus) {
+            return (
+              <Timeline.Item
+                key={x.id}
+                title={
+                  <Text component="span" color="dimmed" size="xs">
                     {x.title}{' '}
-                    <Text component="span" color="dimmed">
+                    {isEditMode && (
                       <ClickableEdit
                         onClick={() => setSelectedCsuitRoleId(x.id)}
                         size={14}
                       />
-                    </Text>
-                  </span>
-                ) : (
-                  x.title
-                )
+                    )}
+                    <VerifiedBadge verified={x.verified} isSmall />
+                  </Text>
+                }
+                bulletSize={8}
+                bullet={
+                  <ThemeIcon color="dark" size={20} radius="xl">
+                    <IconCoin size={20} />
+                  </ThemeIcon>
+                }
+              />
+            );
+          }
+          return (
+            <Timeline.Item
+              key={x.id}
+              title={
+                <span>
+                  {x.title}{' '}
+                  <Text component="span" color="dimmed">
+                    {isEditMode && x.id !== '__NA__' && (
+                      <ClickableEdit
+                        onClick={() => setSelectedCsuitRoleId(x.id)}
+                        size={14}
+                      />
+                    )}
+                  </Text>
+                  <VerifiedBadge verified={x.verified} isSmall />
+                </span>
               }
               bulletSize={x.url ? 30 : x.icon ? 18 : 10}
               bullet={

@@ -11,6 +11,7 @@ import List, {
   ListFilterInput,
   ListItem,
 } from '@c/List';
+import constants from '@h/constants';
 
 const Home: NextPage = () => {
   const [filter, setFilter] = useState('');
@@ -19,7 +20,7 @@ const Home: NextPage = () => {
   return (
     <MainLayout>
       <Head>
-        <title>Layoff watch | Positions</title>
+        <title>{constants.SITE_NAME} | Positions, roles and job titles</title>
       </Head>
       <ContentWithSidebar>
         <StyledListContainer>

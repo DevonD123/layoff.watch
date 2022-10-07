@@ -1,35 +1,37 @@
-import React, { useState } from "react";
-import type { NextPage } from "next";
-import moment from "moment";
-import MainLayout, { ContentWithSidebar } from "@c/Layout";
-import { Text, Title, Stack, Avatar, Chip, } from "@mantine/core";
-import Head from "next/head";
-import { useMinimalCompanyList } from "@c/Company/db";
+import React, { useState } from 'react';
+import type { NextPage } from 'next';
+import moment from 'moment';
+import MainLayout, { ContentWithSidebar } from '@c/Layout';
+import { Text, Title, Stack, Avatar, Chip } from '@mantine/core';
+import Head from 'next/head';
+import { useMinimalCompanyList } from '@c/Company/db';
 import List, {
   ListItem,
   LoadingListItem,
   StyledListContainer,
   ListFilterInput,
-} from "@c/List";
-import { IconBuilding } from "@tabler/icons";
+} from '@c/List';
+import { IconBuilding } from '@tabler/icons';
+import getImage from '@h/getImage';
+import constants from '@h/constants';
 
 const Home: NextPage = () => {
   const { data, isLoading } = useMinimalCompanyList();
-  const [text, setText] = useState("");
-  const [input, setInput] = useState("");
+  const [text, setText] = useState('');
+  const [input, setInput] = useState('');
   const [hasPast, setHasPast] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
   return (
     <MainLayout>
       <Head>
-        <title>Layoff watch | recent layoffs reported</title>
+        <title>{constants.SITE_NAME} | recent layoffs reported</title>
       </Head>
       <Title order={2} align="center">
         Companies
       </Title>
       <ContentWithSidebar>
         <StyledListContainer>
-          <div style={{ display: "flex", marginBottom: 2 }}>
+          <div style={{ display: 'flex', marginBottom: 2 }}>
             <Chip
               checked={hasPast}
               onChange={(checked) => setHasPast(checked)}
@@ -50,11 +52,11 @@ const Home: NextPage = () => {
             onChange={(e) => setInput(e.target.value.toLowerCase())}
             onBlur={() => setText(input)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === 'Enter') {
                 setText(input);
               }
             }}
-            style={{ marginBottom: "1em" }}
+            style={{ marginBottom: '1em' }}
           />
         </StyledListContainer>
         <List>
@@ -80,7 +82,18 @@ const Home: NextPage = () => {
                 <ListItem
                   key={x.company_id}
                   link={`/company/${x.company_id}`}
-                  avatar={<Avatar src={x.logo_url} alt={x.name}><IconBuilding size={24} /></Avatar>}
+                  avatar={
+                    <Avatar
+                      src={getImage({
+                        url: x.uploaded_logo_key,
+                        fallbackUrl: x.logo_url,
+                        size: 24,
+                      })}
+                      alt={x.name}
+                    >
+                      <IconBuilding size={24} />
+                    </Avatar>
+                  }
                   left={
                     <Stack spacing="xs">
                       <Text size="sm">{x.name}</Text>
@@ -96,14 +109,14 @@ const Home: NextPage = () => {
                       </Text>
                     ) : (
                       <Text size="sm" color="green">
-                        No Layoffs yet
+                        No Layoffs reported
                       </Text>
                     )
                   }
                   rightBottom={
                     x.layoff_date
-                      ? moment(x.layoff_date).startOf("day").fromNow()
-                      : ""
+                      ? moment(x.layoff_date).startOf('day').fromNow()
+                      : ''
                   }
                 />
               ))}
@@ -114,52 +127,3 @@ const Home: NextPage = () => {
 };
 
 export default Home;
-/**
- * 
- * <Grid key={x.company_id} className={classes.border}>
-                <Grid.Col span={2} className={classes.center}>
-                  <Avatar src={x.logo_url} alt={x.name}></Avatar>
-                </Grid.Col>
-                <Grid.Col span={5}>
-                  <Stack spacing="xs" className={classes.noGap}>
-                    <Text size="sm" className={classes.textOverflow}>
-                      {x.name}
-                    </Text>
-                    <Text size="xs" color="dimmed">
-                      {x.ticker}
-                    </Text>
-                  </Stack>
-                </Grid.Col>
-                <Grid.Col span={4}>
-                  <Stack spacing="xs" className={classes.noGap}>
-                    {x.amount ? (
-                      <Text size="sm" color="red">
-                        {x.amount} laid off
-                      </Text>
-                    ) : (
-                      <Text size="sm" color="green">
-                        No Layoffs yet
-                      </Text>
-                    )}
-                    {x.layoff_date && (
-                      <Text size="xs" color="dimmed">
-                        {moment(x.layoff_date).startOf("day").fromNow()}
-                      </Text>
-                    )}
-                  </Stack>
-                </Grid.Col>
-                <Grid.Col span={1} className={classes.center}>
-                  <Link href={`/company/${x.company_id}`} passHref>
-                    <ActionIcon
-                      size="xs"
-                      component="a"
-                      variant="light"
-                      color="blue"
-                    >
-                      <IconCaretRight />
-                    </ActionIcon>
-                  </Link>
-                </Grid.Col>
-              </Grid>
- * 
- */

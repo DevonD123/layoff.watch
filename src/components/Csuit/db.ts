@@ -240,7 +240,7 @@ export function useCsuitById(csuit_id?: string) {
     () =>
       supabase
         .from("csuit")
-        .select(`*, csuit_role(*,company(*))`)
+        .select(`*, csuit_role(*,company(*)), csuit_bonus(*,company(name,id))`)
         .eq("id", csuit_id)
         .eq("deleted", false)
         .single()

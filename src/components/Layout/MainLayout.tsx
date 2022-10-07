@@ -36,6 +36,7 @@ import {
   IInternalUser,
 } from '@h/context/userContext';
 import dynamic from 'next/dynamic';
+import constants from '@h/constants';
 
 const DynamicAdminEdit = dynamic(() => import('./AdminEdit'), {
   ssr: false,
@@ -100,7 +101,7 @@ const Links = ({
             />
           </Link>
         ) : (
-          <>
+          <Group position="right">
             <Link href={`/auth?${[QSP.page]}=login`} passHref>
               <Button
                 color="green"
@@ -116,11 +117,12 @@ const Links = ({
                 color="blue"
                 leftIcon={<IconLockAccess size={16} />}
                 mb="sm"
+                mt="sm"
               >
                 Sign up
               </Button>
             </Link>
-          </>
+          </Group>
         )}
       </>
     );
@@ -267,7 +269,7 @@ const MainLayout = ({ children }: IProps) => {
             <BackButton isLargerThanTablet={media.isLargerThanTablet} />
             <Link href="/" passHref>
               <Text weight={700} component="a">
-                Layoff Watch
+                {constants.SITE_NAME}
               </Text>
             </Link>
             {user && (

@@ -12,6 +12,7 @@ import moment from 'moment';
 import { ReportType } from './types';
 import List, { ListItem, LoadingListItem, AvatarWrapper } from '@c/List';
 import constants from '@h/constants';
+import getImage from '@h/getImage';
 
 type Props = {
   fetchPg?: (obj: { pageParam?: number }) => Promise<IPageData>;
@@ -126,7 +127,11 @@ const Feed = ({ fetchPg, cacheKey = 'layoff_feed', cacheObj = {} }: Props) => {
         avatar={getIcon(
           report.type,
           report.company.name,
-          report.company.logo_url
+          getImage({
+            url: report.company.uploaded_logo_key,
+            fallbackUrl: report.company.logo_url,
+            size: 45,
+          })
         )}
         title={report.title}
         verified={report.verified}

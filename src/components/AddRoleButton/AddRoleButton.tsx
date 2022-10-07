@@ -3,11 +3,12 @@ import { Button, Modal, Grid, Text, Checkbox } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import showMsg from '@h/msg';
 import CompanySelect from '@c/Company/CompanySelect';
-import useMediaQueries from '@h/hooks/useMediaQueries';
 import RoleSelect from '@c/Csuit/RoleSelect';
 import moment from 'moment';
-import { start } from 'repl';
 import { addRole } from '@c/Csuit/db';
+import Link from 'next/link';
+import QSP from '@h/qsp';
+import { useInternalUser } from '@h/context/userContext';
 
 interface IAddRoleButtonProps {
   id?: string;
@@ -24,13 +25,13 @@ const defaultRoleData: IRoleDate = {
 };
 
 const AddRoleButton: React.FunctionComponent<IAddRoleButtonProps> = (props) => {
+  const { user, isLoading: usrLoading } = useInternalUser();
   const [open, setOpen] = useState(false);
   const [company, setCompany] = useState<any[]>([]);
   const [role, setRole] = useState<string | null>('');
   const [showEnd, setShowEnd] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [newRole, setNewRole] = useState(defaultRoleData);
-  const media = useMediaQueries();
 
   useEffect(() => {
     if (open) {
@@ -67,6 +68,15 @@ const AddRoleButton: React.FunctionComponent<IAddRoleButtonProps> = (props) => {
       setOpen(false);
     }
   };
+
+  if (!usrLoading && !user) {
+    return (
+      <Link href={`/auth?${QSP.page}=login`} passHref>
+        <Button size="xs">Login to add a role</Button>
+      </Link>
+    );
+  }
+
   return (
     <>
       <Button size="xs" onClick={() => setOpen(true)}>

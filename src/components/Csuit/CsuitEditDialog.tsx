@@ -1,8 +1,8 @@
-import React from "react";
-import { Avatar, Grid, Select, Text, Textarea, TextInput } from "@mantine/core";
-import CreateEntityDialog from "@c/Dialog/CreateEntityDialog";
-import Image from "next/image";
-import getImage from "@h/getImage";
+import React from 'react';
+import { Avatar, Grid, Select, Text, Textarea, TextInput } from '@mantine/core';
+import CreateEntityDialog from '@c/Dialog/CreateEntityDialog';
+import Image from 'next/image';
+import getImage from '@h/getImage';
 
 type Props = {
   isOpen: boolean;
@@ -31,11 +31,11 @@ function CsuitEditDialog({
       open={isOpen}
       title={
         isCreateMode ? (
-          "Add a company to our database"
+          'Add a company to our database'
         ) : (
-          <div style={{ display: "flex" }}>
+          <div style={{ display: 'flex' }}>
             <Avatar style={{ width: 20, height: 20 }}>
-              {data.logo_url ? (
+              {data.logo_url || data.uploaded_logo_key ? (
                 <Image
                   src={getImage({
                     url: data.uploaded_logo_key,
@@ -44,7 +44,7 @@ function CsuitEditDialog({
                   })}
                   width={20}
                   height={20}
-                  alt={"company logo"}
+                  alt={'company logo'}
                 />
               ) : (
                 data.name.charAt(0)
@@ -68,22 +68,22 @@ function CsuitEditDialog({
               if (nameUsed.length >= 1) {
                 nameUsed = nameUsed[0].toUpperCase() + nameUsed.substring(1);
               }
-              onChange(nameUsed, "name");
+              onChange(nameUsed, 'name');
             }}
             label="Name"
             placeholder="John Doe"
-            description={"First & Last"}
+            description={'First & Last'}
           />
         </Grid.Col>
-        <Grid.Col sm={4} style={{ display: "flex", alignItems: "flex-end" }}>
+        <Grid.Col sm={4} style={{ display: 'flex', alignItems: 'flex-end' }}>
           <Select
             label="Role"
             searchable
             clearable
             value={data.role || null}
-            data={["CEO", "CMO", "CTO"]}
+            data={['CEO', 'CMO', 'CTO']}
             onChange={(selected: string) => {
-              onChange(selected, "role");
+              onChange(selected, 'role');
             }}
           />
         </Grid.Col>
@@ -92,8 +92,8 @@ function CsuitEditDialog({
           <Textarea
             id="newBio"
             name="newBio"
-            value={data.bio || ""}
-            onChange={(e) => onChange(e.target.value, "bio")}
+            value={data.bio || ''}
+            onChange={(e) => onChange(e.target.value, 'bio')}
             label="Bio"
             placeholder="Former SWE previosuly manager of the on prem server org."
           />

@@ -1,14 +1,15 @@
-import React from "react";
-import type { NextPage } from "next";
-import MainLayout from "@c/Layout";
-import { Text, Title } from "@mantine/core";
-import Head from "next/head";
+import React from 'react';
+import type { NextPage } from 'next';
+import MainLayout from '@c/Layout';
+import { Text, Title } from '@mantine/core';
+import Head from 'next/head';
+import constants from '@h/constants';
 
 const PIP: NextPage = () => {
   return (
     <MainLayout>
       <Head>
-        <title>Layoff watch | what is a PIP?</title>
+        <title>{constants.SITE_NAME} | what is a PIP?</title>
       </Head>
       <Title align="center">What is a PIP?</Title>
       <Text>

@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import {routeMap,RouteName} from '@c/Layout/AdminEdit'
 import {initMetaData,createJsonRepsonse} from '@h/api/metadata'
 import validate, { createError, isInvalid } from "@h/api/validation";
+import { addIfNotUndefined } from "@h/api/helper";
 
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -133,12 +134,6 @@ export function mapBody(table: RouteName, body:any,isAdmin?:boolean,isAdd?:boole
     return result
 }
 
-const addIfNotUndefined = (result:any,key:string,value:any) => {
-    if(value === undefined){
-        return result
-    }
-    return {...result,[key]:value}
-}
 
 const stripCommasFromNumber = (val?: string|number|null) => {
     if(typeof val === 'string'){

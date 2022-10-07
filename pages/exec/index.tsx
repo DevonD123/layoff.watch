@@ -1,42 +1,43 @@
-import React from "react";
-import { useState } from "react";
-import type { NextPage } from "next";
-import MainLayout, { ContentWithSidebar } from "@c/Layout";
-import { Title } from "@mantine/core";
-import Head from "next/head";
-import AddExecButton from "@c/AddExecButton/AddExecButton";
-import { useAllCSuitSummary } from "@c/Csuit/db";
-import CsuitSummaryListItem from "@c/Csuit/CsuitSummaryListItem";
+import React from 'react';
+import { useState } from 'react';
+import type { NextPage } from 'next';
+import MainLayout, { ContentWithSidebar } from '@c/Layout';
+import { Title } from '@mantine/core';
+import Head from 'next/head';
+import AddExecButton from '@c/AddExecButton/AddExecButton';
+import { useAllCSuitSummary } from '@c/Csuit/db';
+import CsuitSummaryListItem from '@c/Csuit/CsuitSummaryListItem';
 import List, {
   LoadingListItem,
   StyledListContainer,
   ListFilterInput,
-} from "@c/List";
+} from '@c/List';
+import constants from '@h/constants';
 
 const ExecHome: NextPage = () => {
   const { data, isLoading } = useAllCSuitSummary();
-  const [filter, setFilter] = useState("");
-  const [input, setInput] = useState("");
+  const [filter, setFilter] = useState('');
+  const [input, setInput] = useState('');
 
   return (
     <MainLayout>
       <Head>
-        <title>Layoff watch | Execs</title>
+        <title>{constants.SITE_NAME} | Executives</title>
       </Head>
       <ContentWithSidebar>
         <StyledListContainer>
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               marginBottom: 10,
-              position: "sticky",
+              position: 'sticky',
               //position:'-webkit-sticky'
             }}
           >
             <Title order={2} align="left">
-              Executives{" "}
+              Executives{' '}
             </Title>
             <AddExecButton />
           </div>
@@ -44,9 +45,9 @@ const ExecHome: NextPage = () => {
             placeholder="Filter"
             value={input}
             onBlur={(e) => setFilter(input)}
-            onChange={(e) => setInput((e.target.value || "").toLowerCase())}
+            onChange={(e) => setInput((e.target.value || '').toLowerCase())}
             onKeyDown={(e) => {
-              if (e.key == "Enter") {
+              if (e.key == 'Enter') {
                 (e.target as HTMLInputElement).blur();
               }
             }}

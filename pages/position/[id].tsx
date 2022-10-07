@@ -15,6 +15,7 @@ import List, {
   ListFilterInput,
   ListItem,
 } from '@c/List';
+import constants from '@h/constants';
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -50,7 +51,9 @@ const Home: NextPage = () => {
   return (
     <MainLayout>
       <Head>
-        <title>Layoff watch | Position {!isLoading && data.name}</title>
+        <title>
+          {constants.SITE_NAME} | Position {!isLoading && data.name}
+        </title>
       </Head>
       <ContentWithSidebar>
         <StyledListContainer>

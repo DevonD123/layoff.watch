@@ -29,8 +29,8 @@ const Home: NextPage = () => {
     <MainLayout>
       <Head>
         <title>
-          Layoff watch | {isLoading ? 'Company' : data.company.name} layoffs
-          reported
+          {constants.SITE_NAME} | {isLoading ? 'Company' : data.company.name}{' '}
+          layoffs reported
         </title>
       </Head>
       {isLoading ? (
